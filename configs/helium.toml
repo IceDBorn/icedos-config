@@ -1,0 +1,21 @@
+[[icedos.applications.helium.profiles]]
+exec = "helium-social"
+name = "Dtek"
+sites = [
+  "https://crm.dtek.gr/admin",
+  "https://dtekteam.slack.com",
+  "https://gmail.com",
+  "https://mail.zoho.eu/zm",
+  "https://teams.microsoft.com/v2",
+]
+
+[[icedos.applications.helium.profiles]]
+exec = "helium-plesk"
+name = "Plesk"
+sites = [
+  "https://dtekhost.gr:8443",
+  "https://dtekhost01.gr:8443",
+  "https://dtekhost03.gr:8443",
+  "https://dtekhost04.gr:8443",
+  "https://dtekhost05.gr:8443",
+]

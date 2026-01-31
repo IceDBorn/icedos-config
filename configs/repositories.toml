@@ -1,0 +1,45 @@
+[[icedos.repositories]]
+url = "github:icedos/apps"
+# overrideUrl = "path:/home/ice/.code/icedos/apps"
+fetchOptionalDependencies = true
+modules = [
+  "btop",
+  "celluloid",
+  "helium",
+  "lact",
+  "nautilus",
+  "ncdu",
+  "ollama",
+  "opencode",
+  "tailscale",
+  "walker",
+  "zed",
+]
+
+[[icedos.repositories]]
+url = "github:icedos/desktop"
+# overrideUrl = "path:/home/ice/.code/icedos/desktop"
+
+[[icedos.repositories]]
+url = "github:icedborn/dtek-tools"
+# overrideUrl = "path:/home/ice/.code/icedos/dtek-tools"
+modules = ["ddev", "opencart-mcp"]
+
+[[icedos.repositories]]
+url = "github:icedos/hardware"
+# overrideUrl = "path:/home/ice/.code/icedos/hardware"
+modules = [
+  "disable-ipv6",
+  "kernel",
+  "radeon",
+  "ryzen",
+]
+
+[[icedos.repositories]]
+url = "github:icedos/mcp-server"
+# overrideUrl = "path:/home/ice/.code/icedos/mcp-server"
+
+[[icedos.repositories]]
+url = "github:icedos/tweaks"
+# overrideUrl = "path:/home/ice/.code/icedos/tweaks"
+modules = ["cachyos", "gaming", "kernel"]

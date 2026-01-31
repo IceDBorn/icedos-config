@@ -1,0 +1,704 @@
+[icedos.applications.claude-code.users.ice.skills]
+opencart-extension = '''
+---
+name: opencart-extension
+description: Use when writing, modifying, or reviewing OpenCart 3.x extension code — controllers, models, language files, Twig views, install/uninstall lifecycle, event handlers, DB queries, config management, or ocmod XML modifications.
+---
+
+# OpenCart Extension Development
+
+## Overview
+
+OpenCart 3.x extensions follow strict naming, structure, and lifecycle conventions. Every file, class, constant, and method must match the framework's expectations. This guide covers the full set of conventions derived from opencart-box-now, opencart-blacklist, opencart-acs, and opencart-skroutz-feed.
+
+---
+
+## 1. File & Folder Structure
+
+```
+upload/
+  admin/
+    controller/extension/{type}/{name}.php
+    model/extension/{type}/{name}.php
+    language/en-gb/extension/{type}/{name}.php
+    language/el-gr/extension/{type}/{name}.php
+    view/template/extension/{type}/{
+      {name}.twig
+      {name}_list.twig
+      {name}_sale_order_info.twig   ← injected via event
+    }
+  catalog/
+    controller/extension/{type}/{name}.php  ← event hooks only; omit if not needed
+    model/extension/{type}/{name}.php
+    language/en-gb/extension/{type}/{name}.php
+    language/el-gr/extension/{type}/{name}.php
+  system/
+    library/{name}.php  ← only for complex 3rd-party API integrations
+install.xml
+```
+
+`{type}` is the extension type: `shipping`, `module`, `feed`, `payment`, etc.
+`{name}` is lowercase snake_case: `box_now`, `blacklist`, `acs`, `skroutz`.
+
+**Admin-only** extensions (no catalog interaction) omit the entire `catalog/` tree.
+
+---
+
+## 2. Constants Block
+
+Every controller and model declares a set of `private const` values at the top of the class body.
+
+```php
+private const ROUTE  = 'extension/shipping/box_now';  // mirrors the file path
+private const CODE   = 'shipping_box_now';             // used for config keys, events, permissions
+private const MODEL  = 'model_extension_' . self::CODE;
+
+// All error keys used in validate()
+private const ERRORS = ['warning', 'title', 'api_key'];
+
+// All form field names that map directly to config keys (saves boilerplate in index())
+private const FIELDS = [
+    'status', 'title', 'api_key', 'profiles', 'weight_class_id', 'tax_class_id',
+];
+
+// Events: trigger path => full action string
+private const EVENTS = [
+    'admin/view/common/column_left/before'  => self::ROUTE . '/viewCommonColumnLeftBefore',
+    'admin/view/sale/order_info/after'      => self::ROUTE . '/viewSaleOrderInfoAfter',
+    'catalog/model/extension/payment/*/getMethod/after' => self::ROUTE . '/modelExtensionPaymentGetMethodAfter',
+];
+```
+
+**Rules:**
+- Always `private const`, never `const` or `protected const`.
+- `CODE` = `{type}_{name}` (matches `install.xml` `<code>`).
+- `ROUTE` = `extension/{type}/{name}` (matches the file path under `upload/*/controller/`).
+- Reference within the same class as `self::ROUTE`, `self::CODE`, never the class name.
+- For a dynamic model property shortcut: `private const MODEL = 'model_extension_' . self::CODE;` then `$this->{self::MODEL}->method()`.
+
+---
+
+## 3. Class Declaration & @property Tags
+
+```php
+<?php
+
+/**
+ * BOX NOW
+ * @author Dionysis Pasenidis
+ * @link https://github.com/pasenidis
+ * @version 1.0
+ *
+ * @property Loader $load
+ * @property Document $document
+ * @property Session $session
+ * @property Request $request
+ * @property Response $response
+ * @property Language $language
+ * @property Config $config
+ * @property Url $url
+ * @property DB $db
+ * @property Cart\User $user
+ * @property Cart\Weight $weight
+ * @property ModelSettingEvent $model_setting_event
+ * @property ModelSettingSetting $model_setting_setting
+ * @property ModelUserUserGroup $model_user_user_group
+ * @property ModelExtensionShippingBoxNow $model_extension_shipping_box_now
+ */
+class ControllerExtensionShippingBoxNow extends Controller
+{
+```
+
+**Rules:**
+- Blank line immediately after `<?php`.
+- Credits header (name, author, link, version) in the docblock.
+- Every dependency used in the class is declared as a `@property`.
+- Model property names are `model_` + the path with slashes replaced by underscores:
+  `extension/shipping/box_now` → `$model_extension_shipping_box_now`.
+- Namespaced types include the namespace: `Cart\User`, `Cart\Weight`, `Cart\Currency`.
+- Class name mirrors the file path: `upload/admin/controller/extension/shipping/box_now.php` → `ControllerExtensionShippingBoxNow`.
+
+---
+
+## 4. Method Signatures
+
+All public and private methods are fully typed — parameters and return type.
+
+```php
+// Controller actions
+public function index(): void {}
+public function list(): void {}
+protected function validate(): bool {}
+public function install(): void {}
+public function uninstall(): void {}
+
+// Model CRUD
+public function getOrders(array $data = []): array {}
+public function getTotalOrders(array $data): int {}
+public function addOrderHistory(int $order_id, array $data, array $order_info): void {}
+public function getRegion(int $country_id, int $zone_id): string {}
+
+// Private helpers
+private function getBearer(): array {}
+private function apiError(string $code, string $fallback = '', int $http_code = 0): array {}
+
+// Catalog model
+public function getQuote(array $address): array {}
+private function getCost(array $products, array $profile): float {}
+private function validateCustomerGroup(): bool {}
+```
+
+**Event handler signatures** depend on the hook type:
+
+```php
+// view/*/before — modifies $data array in place
+public function viewCommonColumnLeftBefore(string $route = '', array &$data = []): void {}
+
+// view/*/after — modifies rendered $output string in place
+public function viewSaleOrderInfoAfter(string $route = '', array $args = [], string &$output = ''): void {}
+
+// model/*/after — modifies return value array in place
+public function modelExtensionPaymentGetMethodAfter(string $route = '', array $args = [], array &$output = []): void {}
+
+// model/*/after with scalar return (e.g. addProduct returns int)
+public function modelCatalogProductAddProductAfter(string $route = '', array $args = [], int $product_id = 0): void {}
+```
+
+---
+
+## 5. Event Naming
+
+Event method names mirror the trigger path in camelCase:
+
+| Trigger | Method name |
+|---|---|
+| `admin/view/common/column_left/before` | `viewCommonColumnLeftBefore` |
+| `admin/view/sale/order_info/after` | `viewSaleOrderInfoAfter` |
+| `catalog/model/extension/payment/cod/getMethod/after` | `modelExtensionPaymentCodGetMethodAfter` |
+| `admin/model/catalog/product/editProduct/after` | `modelCatalogProductEditProductAfter` |
+
+Registration loop — store full action strings in `EVENTS`, pass them directly:
+
+```php
+$this->model_setting_event->deleteEventByCode(self::CODE);
+
+foreach (self::EVENTS as $trigger => $action) {
+    $this->model_setting_event->addEvent(self::CODE, $trigger, $action);
+}
+```
+
+---
+
+## 6. Install / Uninstall Lifecycle
+
+Order is strict: **permissions → db → events → settings**.
+
+```php
+public function install(): void
+{
+    // 1. Permissions
+    $this->load->model('user/user_group');
+
+    $this->model_user_user_group->addPermission($this->user->getGroupId(), 'access', self::ROUTE);
+    $this->model_user_user_group->addPermission($this->user->getGroupId(), 'modify', self::ROUTE);
+
+    // 2. Database
+    $this->load->model(self::ROUTE);
+
+    $this->model_extension_shipping_box_now->install();   // CREATE TABLE IF NOT EXISTS + migrate()
+
+    // 3. Events
+    $this->load->model('setting/event');
+
+    $this->model_setting_event->deleteEventByCode(self::CODE);
+
+    foreach (self::EVENTS as $trigger => $action) {
+        $this->model_setting_event->addEvent(self::CODE, $trigger, $action);
+    }
+
+    // 4. Settings (defaults)
+    $this->load->model('setting/setting');
+    $this->load->model('localisation/language');
+
+    $language_ids = array_column($this->model_localisation_language->getLanguages(), 'language_id');
+
+    $this->model_setting_setting->editSetting(self::CODE, [
+        self::CODE . '_status' => 0,
+        self::CODE . '_title'  => array_fill_keys($language_ids, 'Extension Name'),
+    ]);
+}
+
+public function uninstall(): void
+{
+    // Reverse order: settings are optional to preserve (user preference)
+    $this->load->model('user/user_group');
+
+    $this->model_user_user_group->removePermission($this->user->getGroupId(), 'access', self::ROUTE);
+    $this->model_user_user_group->removePermission($this->user->getGroupId(), 'modify', self::ROUTE);
+
+    $this->load->model(self::ROUTE);
+
+    $this->model_extension_shipping_box_now->uninstall();  // DROP TABLE IF EXISTS
+
+    $this->load->model('setting/event');
+
+    $this->model_setting_event->deleteEventByCode(self::CODE);
+
+    // deleteSetting is optional — omit to preserve user config on reinstall
+}
+```
+
+**Model install/uninstall + migrations:**
+
+```php
+public function install(): void
+{
+    $this->db->query("
+        CREATE TABLE IF NOT EXISTS `" . DB_PREFIX . "box_now_request` (
+            `order_id`   INT         NOT NULL,
+            `locker_id`  INT         NOT NULL,
+            `region`     VARCHAR(12) NOT NULL DEFAULT 'gr',
+            `created_at` DATETIME    NOT NULL DEFAULT CURRENT_TIMESTAMP,
+            PRIMARY KEY (`order_id`)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+    ");
+
+    $this->migrate();
+}
+
+public function uninstall(): void
+{
+    $this->db->query("DROP TABLE IF EXISTS `" . DB_PREFIX . "box_now_request`");
+}
+
+private function migrate(): void
+{
+    // Safe column addition — check before altering
+    $query = $this->db->query("
+        SHOW COLUMNS FROM `" . DB_PREFIX . "box_now_request` LIKE 'last_event_time'
+    ");
+
+    if (!$query->num_rows) {
+        $this->db->query("
+            ALTER TABLE `" . DB_PREFIX . "box_now_request`
+            ADD COLUMN `last_event_time` DATETIME NULL DEFAULT NULL AFTER `region`
+        ");
+    }
+}
+```
+
+---
+
+## 7. Database Queries
+
+```php
+// SELECT single row
+$query = $this->db->query("
+    SELECT * FROM `" . DB_PREFIX . "box_now_request`
+    WHERE `order_id` = {$order_id}
+    LIMIT 1
+");
+return $query->row;  // array, empty array if not found
+
+// SELECT multiple rows
+$query = $this->db->query("
+    SELECT br.*, o.firstname, o.lastname
+    FROM `" . DB_PREFIX . "box_now_request` br
+        INNER JOIN `" . DB_PREFIX . "order` o ON o.order_id = br.order_id
+    WHERE o.order_status_id > 0
+    ORDER BY br.order_id DESC
+");
+return $query->rows;  // array of arrays
+
+// COUNT
+$query = $this->db->query("SELECT COUNT(*) AS total FROM `" . DB_PREFIX . "box_now_request`");
+return (int)$query->row['total'];
+
+// INSERT
+$this->db->query("
+    INSERT INTO `" . DB_PREFIX . "box_now_request`
+    SET `order_id`  = {$order_id},
+        `locker_id` = {$locker_id},
+        `region`    = '" . $this->db->escape($data['region']) . "',
+        `created_at` = NOW()
+");
+$id = $this->db->getLastId();
+
+// UPDATE
+$this->db->query("
+    UPDATE `" . DB_PREFIX . "box_now_request`
+    SET `region` = '" . $this->db->escape($data['region']) . "'
+    WHERE `order_id` = {$order_id}
+");
+
+// DELETE
+$this->db->query("
+    DELETE FROM `" . DB_PREFIX . "box_now_request`
+    WHERE `order_id` = {$order_id}
+");
+```
+
+**Rules:**
+- Always wrap table names in backticks and prepend `DB_PREFIX`.
+- Integer values: interpolate directly `{$order_id}` or cast `(int)$value` inline.
+- String values: always `$this->db->escape($value)` inside single quotes.
+- Result access: `$query->row` (single), `$query->rows` (multiple), `$query->num_rows` (count check).
+- Last insert ID: `$this->db->getLastId()`.
+- Affected rows: `$this->db->countAffected()`.
+- No prepared statements — OpenCart's `$this->db->escape()` is the escaping mechanism.
+
+---
+
+## 8. Config Read / Write
+
+```php
+// Read — always prefix with CODE
+$status = (int)$this->config->get(self::CODE . '_status');
+$profiles = (array)$this->config->get(self::CODE . '_profiles');
+$weight_id = (int)$this->config->get(self::CODE . '_weight_class_id');
+
+// Multi-language config — keyed by language_id integer
+$lang_id = (int)$this->config->get('config_language_id');
+$title = $this->config->get(self::CODE . '_title')[$lang_id] ?? 'Default Title';
+
+// Write all fields at once
+$this->model_setting_setting->editSetting(self::CODE, $this->request->post);
+
+// Write specific defaults
+$this->model_setting_setting->editSetting(self::CODE, [
+    self::CODE . '_status'     => 0,
+    self::CODE . '_title'      => array_fill_keys($language_ids, 'My Extension'),
+    self::CODE . '_sort_order' => 0,
+]);
+
+// Delete all settings for this extension
+$this->model_setting_setting->deleteSetting(self::CODE);
+```
+
+**Config key pattern:** always `{CODE}_{field_name}` — e.g. `shipping_box_now_status`, `feed_skroutz_profiles`.
+**Type-cast on every read** — `(int)`, `(float)`, `(array)`, `(bool)` as appropriate.
+
+---
+
+## 9. Language Files
+
+**File structure:**
+
+```php
+<?php
+
+/**
+ * BOX NOW
+ * @author Dionysis Pasenidis
+ * @link https://github.com/pasenidis
+ * @version 1.0
+ */
+
+$_ = [
+    // Heading
+    'heading_title'    => 'BOX NOW',
+
+    // Text
+    'text_extension'   => 'Extensions',
+    'text_success'     => 'Success: You have successfully modified BOX NOW!',
+    'text_edit'        => 'Edit BOX NOW',
+    'text_no_results'  => 'No results!',
+
+    // Tabs
+    'tab_general'      => 'General',
+
+    // Entries (form labels)
+    'entry_status'     => 'Status',
+    'entry_title'      => 'Title',
+
+    // Columns (table headers)
+    'column_order_id'  => 'Order ID',
+    'column_action'    => 'Action',
+
+    // Errors
+    'error_permission' => 'Warning: You do not have permission to modify BOX NOW!',
+    'error_title'      => 'Title is required!',
+];
+```
+
+**Always include** as the baseline: `heading_title`, `text_extension`, `text_success`, `text_edit`, `entry_status`, `error_permission`. `text_edit` is used as the panel `<h3>` heading in the twig (e.g. `'Edit Extension Name'`), distinct from `heading_title` which is the page `<h1>` title.
+
+**Never include** keys OpenCart core already provides globally: `text_enabled`, `text_disabled`, `text_home`, `button_save`, `button_cancel`.
+
+**Key prefix conventions:** `heading_`, `text_`, `tab_`, `entry_`, `column_`, `button_`, `error_`, `label_`.
+
+**Array structure rules:**
+- Single `$_` array per file — never split into multiple arrays.
+- Group keys by prefix using section comments: `// Heading`, `// Text`, `// Tab`, `// Entry`, `// Column`, `// Button`, `// Error`, etc.
+- Key-value pairs are aligned within each group.
+
+**Loading and using:**
+
+```php
+$this->load->language(self::ROUTE);       // load into default namespace
+$this->language->get('heading_title');    // retrieve a string
+
+// Load into named namespace (for injection into another page)
+$this->load->language(self::ROUTE, 'ext');
+$this->language->get('ext')->get('tab_box_now');
+```
+
+---
+
+## 10. URL Generation
+
+Always use the array form — never string concatenation for query parameters.
+
+```php
+// ✅ Correct
+$this->url->link('common/dashboard', ['user_token' => $data['user_token']], true);
+$this->url->link(self::ROUTE, ['user_token' => $data['user_token']], true);
+$this->url->link(self::ROUTE . '/list', ['user_token' => $data['user_token'], 'page' => '{page}'], true);
+
+// ❌ Never
+$this->url->link(self::ROUTE . '/list', 'user_token=' . $this->session->data['user_token'], true);
+```
+
+Third argument `true` = HTTPS (always pass it).
+
+---
+
+## 11. JSON / AJAX Responses
+
+Add a private helper method for JSON responses:
+
+```php
+private function jsonResponse(array $data): void
+{
+    $this->response->addHeader('Content-Type: application/json');
+    $this->response->setOutput(json_encode($data));
+}
+```
+
+Usage pattern for AJAX endpoints:
+
+```php
+public function remove(): void
+{
+    $json = [];
+
+    if (!$this->user->hasPermission('modify', self::ROUTE)) {
+        $json['error'] = $this->language->get('error_permission');
+    } else {
+        $order_id = (int)($this->request->post['order_id'] ?? 0);
+        $this->load->model(self::ROUTE);
+        $this->model_extension_module_blacklist->removeBlacklist($order_id);
+        $json['success'] = $this->language->get('text_success');
+    }
+
+    $this->jsonResponse($json);
+}
+```
+
+---
+
+## 12. ocmod XML
+
+**install.xml** (metadata only — no modification operations):
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<modification>
+    <name>BOX NOW</name>
+    <code>shipping_box_now</code>
+    <version>1.0</version>
+    <author>Dionysis Pasenidis</author>
+    <link>https://github.com/pasenidis</link>
+</modification>
+```
+
+`<code>` matches `self::CODE` exactly.
+
+**Actual modification XML** (when patching core or third-party files):
+
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<modification>
+    <name>Extension Name</name>
+    <code>type_name</code>
+    <version>1.0</version>
+    <author>Dionysis Pasenidis</author>
+    <link>https://github.com/pasenidis</link>
+
+    <!-- Single file -->
+    <file path="admin/controller/sale/order.php">
+        <operation error="log">
+            <search><![CDATA[
+$data['breadcrumbs'][] = array(
+]]></search>
+            <add position="before"><![CDATA[
+// injected code here
+]]></add>
+        </operation>
+    </file>
+
+    <!-- Glob — multiple files at once -->
+    <file path="catalog/controller/product/{category,manufacturer,product}.php">
+        <operation error="skip">
+            <search><![CDATA[existing code]]></search>
+            <add position="after"><![CDATA[injected code]]></add>
+        </operation>
+    </file>
+
+    <!-- Wildcard theme path -->
+    <file path="catalog/view/theme/*/template/account/order_list.twig">
+        <operation error="log" index="1">
+            <search trim="true"><![CDATA[search text]]></search>
+            <add position="replace"><![CDATA[replacement text]]></add>
+        </operation>
+    </file>
+</modification>
+```
+
+**Attribute reference:**
+
+| Attribute | Values | Meaning |
+|---|---|---|
+| `error` on `<operation>` | `log` / `skip` | Log failure or silently skip if search not found |
+| `position` on `<add>` | `before` / `after` / `replace` | Where to inject relative to `<search>` match |
+| `index` on `<operation>` | `0`, `1`, `2`… | Target the nth occurrence when search matches multiple times |
+| `trim` on `<search>` or `<add>` | `true` | Strip leading/trailing whitespace before matching |
+
+All code content goes inside `<![CDATA[...]]>` sections. 4-space indentation for the XML structure; content inside CDATA preserves original file indentation.
+
+---
+
+## 13. Code Style
+
+```php
+<?php
+// ↑ blank line immediately after opening tag
+
+/**
+ * Extension Name
+ * @author Dionysis Pasenidis
+ * @link https://github.com/pasenidis
+ * @version 1.0
+ * ...
+ */
+```
+
+- **Indentation:** 4 spaces for PHP, 2 spaces for Twig and JS.
+- **Line length:** max 120 chars for PHP, 360 for Twig.
+- **Arrays:** short syntax `[]` always; key-value pairs aligned when in a block.
+- **Alignment:** ONLY array key-value pairs are aligned. Never align `@property` tags, variable assignments, or anything else.
+- **Constants:** `private const`, UPPER_SNAKE_CASE, `self::` for references.
+- **Closures:** use `static function` when `$this` is not needed.
+- **Null coalescing:** prefer `??` and `??=` over isset checks.
+- **No `goto`.**
+- **Blank line** before `return` is optional but consistent within a file.
+- **UTF-8, LF** line endings everywhere.
+
+**Spacing / grouping conventions:**
+
+Consecutive `$this->load->language()`, `$this->load->model()`, and `$this->document->` calls are each grouped together. Add a blank line after each group when the next statement is a different kind:
+
+```php
+// ✅ language group, then blank line
+$this->load->language(self::ROUTE);
+
+$this->document->setTitle($this->language->get('heading_title'));
+
+$this->load->model('setting/setting');
+
+$data = [];
+
+// ✅ multiple model loads stay together, blank line after the group
+$this->load->model('setting/setting');
+$this->load->model('localisation/language');
+
+$languages = $this->model_localisation_language->getLanguages();
+
+// ✅ load->model, then blank line before using the model
+$this->load->model('user/user_group');
+
+$this->model_user_user_group->addPermission($this->user->getGroupId(), 'access', self::ROUTE);
+$this->model_user_user_group->addPermission($this->user->getGroupId(), 'modify', self::ROUTE);
+```
+
+```php
+// ✅ Key-value alignment in arrays only
+private const EVENTS = [
+    'admin/view/common/column_left/before' => self::ROUTE . '/viewCommonColumnLeftBefore',
+    'admin/view/sale/order_info/after'     => self::ROUTE . '/viewSaleOrderInfoAfter',
+];
+
+// ✅ Static closure
+$titles = array_map(static function (array $language): string {
+    return $language['name'];
+}, $languages);
+
+// ✅ Null coalescing with type cast — no variable alignment
+$page = max((int)($this->request->get['page'] ?? 1), 1);
+$order_id = (int)($this->request->post['order_id'] ?? $this->request->get['order_id'] ?? 0);
+```
+
+---
+
+## 14. Settings Page Pattern (index())
+
+Settings pages **never redirect** after save. They always redisplay the form with `$data['success']` set inline. Never use `$this->session->data['success']`.
+
+Use local `$action` and `$cancel` variables to avoid repeating the URL — reuse them in breadcrumbs and in `$data`.
+
+In the `self::FIELDS` loop, extract the config key into `$key` to avoid repetition.
+
+```php
+public function index(): void
+{
+    $this->load->language(self::ROUTE);
+
+    $this->document->setTitle($this->language->get('heading_title'));
+
+    $data = [];
+
+    if ($this->request->server['REQUEST_METHOD'] === 'POST' && $this->validate()) {
+        $this->load->model('setting/setting');
+
+        $this->model_setting_setting->editSetting(self::CODE, $this->request->post);
+
+        $data['success'] = $this->language->get('text_success');
+    }
+
+    $data['errors'] = [];
+
+    foreach (self::ERRORS as $error) {
+        $data['errors'][$error] = $this->error[$error] ?? '';
+    }
+
+    $data['breadcrumbs'] = [
+        [
+            'text' => $this->language->get('text_home'),
+            'href' => $this->url->link('common/dashboard', ['user_token' => $this->session->data['user_token']], true),
+        ],
+        [
+            'text' => $this->language->get('text_extension'),
+            'href' => $cancel = $this->url->link('marketplace/extension', ['user_token' => $this->session->data['user_token'], 'type' => 'module'], true),
+        ],
+        [
+            'text' => $this->language->get('heading_title'),
+            'href' => $action = $this->url->link(self::ROUTE, ['user_token' => $this->session->data['user_token']], true),
+        ],
+    ];
+
+    $data['action'] = $action;
+    $data['cancel'] = $cancel;
+
+    foreach (self::FIELDS as $field) {
+        $key = self::CODE . '_' . $field;
+        $data[$field] = $this->request->post[$key] ?? $this->config->get($key);
+    }
+
+    $data['header']      = $this->load->controller('common/header');
+    $data['column_left'] = $this->load->controller('common/column_left');
+    $data['footer']      = $this->load->controller('common/footer');
+
+    $this->response->setOutput($this->load->view(self::ROUTE, $data));
+}
+```
+'''

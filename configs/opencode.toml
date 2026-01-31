@@ -1,0 +1,154 @@
+[icedos.applications.ollama]
+loadModels = ["minimax-m3:cloud"]
+
+[icedos.applications.opencode.extraSettings.mcp.context7]
+type = "local"
+enabled = true
+command = ["nix-shell", "-p", "nodejs", "--run", "npx -y @upstash/context7-mcp@latest"]
+
+[icedos.applications.opencode.extraSettings.mcp.nixos]
+type = "local"
+enabled = true
+command = ["nix-shell", "-p", "uv", "--run", "uvx mcp-nixos"]
+
+[icedos.applications.opencode.extraSettings.mcp.icedos]
+type = "local"
+enabled = true
+command = ["icedos", "mcp", "serve"]
+
+[icedos.applications.opencode.extraSettings.mcp.basic-memory]
+type = "local"
+enabled = true
+command = [
+  "nix-shell",
+  "-p",
+  "uv",
+  "python313",
+  "stdenv.cc.cc.lib",
+  "gcc",
+  "--run",
+  """
+    export BASIC_MEMORY_CONFIG_DIR="$HOME/.config/basic-memory"
+    export BASIC_MEMORY_HOME="$HOME/.local/share/basic-memory"
+    export LD_LIBRARY_PATH=$(dirname $(gcc -print-file-name=libstdc++.so.6)):$LD_LIBRARY_PATH
+
+    uvx --python 3.13 basic-memory mcp
+  """
+]
+
+[icedos.applications.opencode.extraSettings.mcp.chrome-devtools]
+type = "local"
+enabled = true
+command = ["nix-shell", "-p", "nodejs", "--run", "npx -y chrome-devtools-mcp@latest --executable-path=/run/current-system/sw/bin/helium --isolated=true --no-usage-statistics"]
+
+[icedos.applications.opencode.skills]
+memory-first = """
+---
+name: memory-first
+description: Use ALWAYS — persist all knowledge to Basic Memory MCP before and after every task. Never rely on context window alone.
+---
+
+# Memory-First Agent Behavior
+
+## Before Starting Any Work
+
+1. `basic-memory_search_notes(query="topic")` — check if you already know this
+2. `basic-memory_recent_activity(timeframe="3d")` — see what recently changed
+3. `basic-memory_build_context(url="memory://project/notes")` — load relevant context
+
+## After Finishing Work
+
+Always save outcomes:
+```
+basic-memory_write_note(
+  title="Topic Title",
+  content="...",
+  directory="projects/relevant-project"
+)
+```
+
+Use `basic-memory_edit_note` to update existing notes instead of creating duplicates.
+
+## When to Save
+
+Save a note after any of these:
+- Decisions made (architecture, tooling, design tradeoffs)
+- Bugs found and their root causes
+- User preferences and project conventions
+- Configuration changes and their rationale
+- Anything that took >2 tool calls to figure out
+
+## Save Structure
+
+```markdown
+# Title
+
+## Context
+Background
+
+## Observations
+- [decision] Use X because Y #tag
+- [technique] How to do Z #tag
+
+## Relations
+- relates_to [[Related Topic]]
+```
+
+## Tool Usage Priority (never skip)
+
+1. **Basic Memory** — check and save knowledge first
+2. **MCP tools** — use domain-specific MCPs before generic tools
+3. **Skills** — load via `skill` tool if task matches
+4. **Search tools** — search before acting, don't assume
+5. **File tools** — Read/Grep/Glob only when MCPs can't help
+6. **Bash** — absolute last resort
+
+## Key Rule
+
+**NEVER rely on your own context window as the sole memory.** Always persist to Basic Memory so knowledge survives across sessions.
+"""
+
+icedos-mcp = """
+---
+name: icedos-mcp
+description: Use ALWAYS when working on IceDOS — prefer mcp__icedos__* and mcp__nixos__* tools over manual file reads, grep, or web searches for IceDOS/NixOS questions.
+---
+
+# IceDOS MCP-First Behavior
+
+## Mandatory Tool Order for IceDOS Work
+
+1. **IceDOS MCP** (`mcp__icedos__*`) — config, options, modules, repo source, system
+2. **NixOS MCP** (`mcp__nixos__*`) — nixpkgs packages, NixOS/home-manager options
+3. **Basic Memory** — check/save knowledge
+4. **Search tools** — `websearch` only when MCPs can't answer
+5. **File tools** — `Read`/`Grep`/`Glob` only for non-IceDOS files
+6. **Bash** — absolute last resort
+
+## What Each MCP Covers
+
+### IceDOS MCP
+- **Config** — `get_config`, `get_config_value`, `set_config_value`, `delete_config_value`, `list_repositories`, `enable_module`, `disable_module`. Never hand-edit `config.toml`.
+- **Options** — `search_options`, `get_option` for `icedos.*` options.
+- **Modules** — `list_modules`, `search_modules`, `get_module`, `module_graph`.
+- **Repo source** — `list_repo_tree` + `read_repo_file` for any icedos repo (local or online). Use instead of manual file reads.
+- **System** — `doctor`, `rebuild`, `rollback`, `get_generations_tool`, `diff_generations`, `list_inputs`, `list_packages`, `run_package`.
+
+### NixOS MCP
+- Non-`icedos.*` options (nixpkgs, NixOS, home-manager).
+- Package search, info, version history.
+- Flake inputs, binary cache, NixOS wiki.
+
+## When NOT to Use MCPs
+
+- Editing a file in place (use `Edit` tool)
+- Reading non-IceDOS files (use `Read` tool)
+- Git operations (use `Bash`)
+
+## Key Rule
+
+**The MCPs are the source of truth.** Never guess, never hand-parse TOML, never grep for option names — ask the MCP.
+"""
+
+[icedos.applications.opencode.extraSettings.experimental]
+mcp_timeout = 3600000

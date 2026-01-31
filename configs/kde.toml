@@ -1,0 +1,67 @@
+[[icedos.repositories]]
+url = "github:icedos/kde"
+# overrideUrl = "path:/home/ice/.code/icedos/kde"
+modules = ["dynamic-workspaces", "krohnkite", "move-to-desktop-follow", "no-titlebar", "window-borders"]
+fetchOptionalDependencies = true
+
+[icedos.desktop.kde]
+excludeDefaultPackages = [
+  "aurorae",
+  "baloo-widgets",
+  "dolphin",
+  "dolphin-plugins",
+  "plasma-browser-integration",
+  "plasma-workspace-wallpapers",
+]
+
+[icedos.desktop.kde.keyboard]
+switchingPolicy = "window"
+
+[icedos.desktop.kde.panel]
+height = 32
+location = "top" # top, bottom, left, right, floating
+widgets = [
+  "org.kde.plasma.pager",
+  "org.kde.plasma.panelspacer",
+  "org.kde.plasma.icontasks",
+  "org.kde.plasma.panelspacer",
+  "org.kde.plasma.marginsseparator",
+  "org.icedos.climit",
+  "org.kde.plasma.systemtray",
+  "org.kde.plasma.digitalclock",
+  "org.kde.plasma.lock_logout",
+]
+
+[icedos.desktop.kde.panel.systemTray]
+disabledApplets = [
+  "org.kde.plasma.clipboard",
+  "org.kde.plasma.weather",
+]
+
+[[icedos.desktop.kde.screenEdges]]
+position = "topLeft"
+action = "none"
+
+[icedos.desktop.kde.shortcuts.bindings."KDE Keyboard Layout Switcher"]
+"Switch to Next Keyboard Layout" = "Meta+Space"
+
+[icedos.desktop.kde.shortcuts.bindings."services/org.kde.spectacle.desktop"]
+_launch = "Meta+P"
+
+[icedos.desktop.kde.shortcuts.hotkeys.walker-applications]
+name = "Walker"
+command = "walker -m desktopapplications"
+key = "Meta+R"
+logs.enabled = false
+
+[icedos.desktop.kde.shortcuts.hotkeys.walker-clipboard]
+name = "Walker Clipboard"
+command = "walker -m clipboard"
+key = "Meta+V"
+logs.enabled = false
+
+[icedos.desktop.kde.shortcuts.hotkeys.walker-emojis]
+name = "Walker Emojis"
+command = "walker -m symbols"
+key = "Meta+E"
+logs.enabled = false

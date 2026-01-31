@@ -1,0 +1,77 @@
+[icedos.applications.btop]
+diskExclusions = ["/boot", "/home"]
+
+[icedos.applications.kitty]
+hideDecorations = true
+
+[icedos.applications.zed]
+vim = true
+
+[icedos.applications.zed.languages.PHP]
+language_servers = ["intelephense"]
+
+[icedos.applications.zed.lsp.intelephense.settings.format]
+braces = "k&r"
+
+[icedos.applications.zed.lsp.taplo.settings.formatter]
+alignComments = false
+reorderKeys = false
+
+[icedos.desktop]
+autologinUser = "ice"
+defaultBrowser = "helium.desktop"
+defaultEditor = "dev.zed.Zed.desktop"
+wallpaper = "/home/ice/Pictures/wallpaper.jpg"
+
+[icedos.desktop.bookmarks]
+public = false
+templates = false
+
+[icedos.desktop.windows.focus]
+delay = 0
+followsMouse = true
+
+[icedos.desktop.xdgDesktopPortal]
+forceGtkFilePicker = true
+
+[icedos.desktop.stylix]
+enable = true
+disabledTargets = ["console", "kmscon"]
+
+[icedos.desktop.windows]
+maximizeButton = false
+minimizeButton = false
+
+[icedos.desktop.users.ice]
+startupScript = "helium-social"
+
+[icedos.hardware.kernel]
+variant = "latest"
+
+[icedos.hardware.network]
+firewall = false
+
+[icedos.users.ice]
+description = "IceDBorn"
+
+[icedos.tweaks.cachyos]
+useAdios = true
+useCachyosZramProfile = true
+
+[icedos.system]
+packages = [
+  "anydesk",
+  "beekeeper-studio",
+  "teamviewer",
+]
+version = "25.11"
+
+[icedos.system.bootloaders.systemd-boot]
+mountPoint = "/boot"
+
+[icedos.system.git.users.ice]
+username = "IceDBorn"
+email = "git.outsider841@simplelogin.fr"
+
+[icedos.system.toolset]
+desktopEntries = true
