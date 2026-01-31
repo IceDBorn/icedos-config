@@ -1,0 +1,18 @@
+--- a/vendor/github.com/klauspost/pgzip/gunzip.go
++++ b/vendor/github.com/klauspost/pgzip/gunzip.go
+@@ -472,6 +472,7 @@
+ 			n = copy(p, avail)
+ 			z.blockPool <- z.current
+ 			z.current = nil
++			z.roff = 0
+ 			if z.lastBlock {
+ 				err = io.EOF
+ 				break
+@@ -525,6 +526,7 @@
+ 		}
+ 		z.blockPool <- z.current
+ 		z.current = nil
++		z.roff = 0
+ 	}
+ 	for {
+ 		if z.err != nil {

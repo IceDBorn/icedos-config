@@ -1,0 +1,107 @@
+[icedos.ai-tools.rules]
+git-commits = """
+# Git commit policy
+
+Always:
+
+- Never run `git commit` unless the user explicitly asks you to commit.
+- Stage changes with `git add` when a task is done, then stop and report what is staged.
+- A commit request covers only that one commit, not later changes.
+"""
+
+comment-rules = """
+# Code comment policy
+
+Always:
+
+- Comments at most 2 lines, single line preferred.
+- No multi-line header blocks; no restating what code obviously does.
+- Comment only where non-obvious (tricky logic, constraints).
+- When editing existing code, trim new comments to the minimum needed.
+"""
+
+clean-leftovers = """
+# Leftover cleanup
+
+Always:
+
+- Before finishing a task, delete every leftover you created: temp files, scratch scripts, state or round files, logs, test outputs, backup copies.
+- Stop background processes, dev servers and subagent sessions you started.
+- Remove debug prints and throwaway code you added.
+- Keep only what the user asked for. If unsure whether a file is wanted, ask instead of leaving it.
+- Clear Nix store garbage you created. Call the icedos MCP tool `gc_roots` with `under=` set to each dir you worked in, then pass the `result` links and other roots you made to `nix_cleanup`. It unlinks them and deletes their targets unless something still uses them. `collect=true` also drops every unreferenced path.
+- Call `build_cleanup` for the paths your `nix_build` runs added to remote hosts, drive stores and the host store.
+- Leave roots you did not make alone, such as `.direnv` roots and a project's own `.gcroots`.
+- Never delete old generations (`nix-collect-garbage -d`, `--delete-older-than`) unless the user asks.
+- Without the icedos MCP, remove the links yourself, then run `nix store delete <path>` or `nix-collect-garbage`.
+"""
+
+nix-flake-store-copy = """
+# Flakes outside git copy the whole directory
+
+Always:
+
+- A flake in a directory without `.git` is a `path:` flake. Nix copies the entire directory recursively into `/nix/store` on every evaluation where its contents changed.
+- That copy includes `node_modules`, build outputs, `result` links, datasets and VM images. Repeated runs can fill the root disk.
+- `.gitignore` only filters the copy inside a git repo. Without `.git`, Nix ignores it.
+- Inside a git repo Nix copies only tracked files, so new files need `git add` before the flake sees them.
+- Before `nix run`, `nix develop`, `nix flake check` or a build on a local flake, call the icedos MCP tool `flake_preflight` with the absolute ref. It reports the copy size, the heavy entries and untracked files, and refuses copies over `storage.maxFlakeCopyMb`. `nix_build` runs it itself.
+- If it refuses, run `git init`, add a `.gitignore` and `git add` the needed files, or move the flake into a small subdirectory.
+- After such runs, remove the store copies as described in the leftover cleanup rule. `build_cleanup` deletes the source copies of flakes built with `nix_build`.
+- Without the icedos MCP, check the size with `du -sh` before running the flake.
+"""
+
+dev-plans = """
+# Plans are development-only
+
+Always:
+
+- Plan, spec and design files you write (for example under `docs/superpowers/plans/` or `docs/superpowers/specs/`) are working notes for development only.
+- Never commit them. Leave them out of `git add`, and unstage them if a broad `git add` picked them up.
+- Do not add them to `.gitignore` unless the user asks. Keep them untracked in the working tree.
+- If a plan file is already tracked, tell the user instead of removing it from git yourself.
+"""
+
+storage-drives = """
+# Heavy files and Nix stores go on the secondary drives
+
+Always:
+
+- The root disk (`/`, NVMe, about 2000 MB/s) is small and nearly full. Use it, including the host `/nix/store`, only when the task requires it or needs the fastest disk.
+- Put everything else that is large (gigabytes) on a secondary drive. This covers test datasets, VM and disk images, model weights, downloaded archives, build caches, Nix builds and files kept until a plan is implemented.
+- Before writing anything large, call the icedos MCP tool `storage_pick` with `need_gb`, the `io` kind and a `project` name. It keeps 30 GB free on every drive, since Steam and games need room to update, and returns a created `<mount>/ai-dump/<project>/`.
+- Use `io="random"` (SSD) for Nix builds, compiling, databases, running VM disks and `node_modules`, and `io="sequential"` (HDD) for archives, datasets, backups and files parked until a plan is implemented.
+- Keep one task on one drive. Do not split a build or dataset across drives.
+- For Nix builds, pass a `need_gb` estimate to `nix_build`. With `store="auto"` it moves large local builds to a store on an SSD and gives the `nix shell --store ...` command to run the output. Drive stores share nothing with the host `/nix/store`, so the first build there downloads its dependencies again.
+- Never use a drive store for `nixos-rebuild`, IceDOS rebuilds or anything the system or user profile must reference. Those need the host store.
+- Only touch `ai-dump`. Never touch other directories on these drives, such as `games`, `steam`, `videos` or `expunged`.
+- When the task or plan that needed the files is done, delete them as described in the leftover cleanup rule. `build_cleanup` deletes your drive store builds, and `storage_status` shows what each `ai-dump` entry holds.
+- Without the icedos MCP, run `df -h / /mnt/games-ssd /mnt/games-ssd-2 /mnt/games-hdd` to pick a drive, and pass `--store <mount>/ai-dump/nix-store` to every `nix` command that uses a drive store.
+"""
+
+remote-builders = """
+# Remote Nix build hosts
+
+Always:
+
+- For a heavy Nix build (compilers, kernels, browsers, VM tests, anything over a few minutes), call the icedos MCP tool `nix_build` with `host="auto"`. It checks this PC's load and every host in `icedos.ai-tools.mcp-server.build.hosts`, and offloads only when this PC is busy. `build_hosts` shows why it picked a host.
+- For heavy work that is not a Nix build (cargo, make, cmake, go, npm builds, test suites), call `shell_run` with `host="auto"` instead of running `nix-shell` or `icedos shell` in Bash. It picks the machine the same way, syncs the dir to a host and runs the command there in a Nix shell evaluated on this PC.
+- Small builds, small commands and evaluations stay local.
+- Remote outputs stay in the host's store, because the remote users are not trusted. Inspect them over `ssh`, or copy files back with `scp`.
+- Never use remote hosts for `nixos-rebuild` or IceDOS rebuilds. Those need the local store.
+- These are other people's PCs. Only touch the Nix store and files you created under `/tmp`. `shell_run` keeps its work under `/tmp/icedos-mcp-<user>/`.
+- Call `build_cleanup` once you are done with the outputs and `shell_run` work dirs, as described in the leftover cleanup rule.
+- Without the icedos MCP, build with `nix build --eval-store auto --store ssh-ng://<host> --no-link --print-out-paths <installable>`. The local `builders` setting does not work, because this user is not in `trusted-users`.
+"""
+
+kwin-mcp = """
+# KWin MCP sessions
+
+Always:
+
+- Start kwin-mcp work with `session_start`. It runs an isolated virtual headless KWin session that does not touch the user's desktop.
+- Use `session_connect` to the live desktop only when the task needs the real session, such as the user's open windows, their running apps or state, or input from the user.
+- Before calling `session_connect`, tell the user why the live desktop is needed.
+- On the live desktop, release held input before ending the turn.
+- Call `session_stop` when done, for both virtual and live sessions.
+"""

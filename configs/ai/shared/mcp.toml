@@ -1,0 +1,50 @@
+[[icedos.repositories]]
+url = "github:icedos/ai-tools"
+modules = [
+  "basic-memory-mcp",
+  "chrome-devtools-mcp",
+  "context7-mcp",
+  "ddev-mcp",
+  "kwin-mcp",
+  "mcp-server",
+  "nixos-mcp",
+  "opencart-mcp",
+  "pagespeed-insights-mcp",
+  "plesk-mcp",
+  "rea-mcp",
+]
+
+[icedos.ai-tools.chrome-devtools-mcp]
+executablePath = "/run/current-system/sw/bin/helium"
+
+[icedos.ai-tools.mcp-server.storage]
+priority = ["/mnt/storage", "host"]
+
+[icedos.ai-tools.mcp-server.storage.drives]
+"/mnt/storage" = "random"
+
+[icedos.ai-tools.plesk-mcp.servers.dtekhost]
+host = "https://dtekhost.gr:8443"
+
+[icedos.ai-tools.plesk-mcp.servers.dtekhost01]
+host = "https://dtekhost01.gr:8443"
+
+[icedos.ai-tools.plesk-mcp.servers.dtekhost03]
+host = "https://dtekhost03.gr:8443"
+
+[icedos.ai-tools.plesk-mcp.servers.dtekhost04]
+host = "https://dtekhost04.gr:8443"
+
+[icedos.ai-tools.plesk-mcp.servers.dtekhost05]
+host = "https://dtekhost05.gr:8443"
+
+[icedos.ai-tools.mcp-servers.synology]
+command = "nix-shell"
+args = ["-p", "uv", "python3", "--run", "uvx --python python3 mcp-server-synology"]
+
+[icedos.ai-tools.mcp-servers.perfex-crm]
+command = "nix-shell"
+args = ["-p", "nodejs", "--run", "node /mnt/storage/Projects/dtek/infastructure/mcp/perfex-crm-mcp/dist/index.js"]
+
+[icedos.ai-tools.mcp-gateway-modes]
+synology = "global"

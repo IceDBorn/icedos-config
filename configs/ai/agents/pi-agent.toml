@@ -1,0 +1,41 @@
+[[icedos.repositories]]
+url = "github:icedos/ai-tools"
+modules = [
+  "pi-agent",
+  "vpn-rotate",
+]
+
+[icedos.ai-tools.pi-agent.default]
+ provider = "opencode-free"
+ model = "deepseek-v4.1-flash-free"
+
+[icedos.ai-tools.pi-agent.extensions]
+opencodeFree = true
+
+[icedos.ai-tools.pi-agent.extensions.context-language-models]
+enable = true
+
+[icedos.ai-tools.pi-agent.extensions.context-window-cap]
+enable = true
+
+[icedos.ai-tools.pi-agent.extensions.recursive-language-models]
+enable = true
+autoload = true
+
+[icedos.ai-tools.pi-agent.extensions.vpn-rotate]
+fallbackModels = [
+  "deepseek-v4.1-flash-free",
+  "mimo-v2.6-flash-free",
+]
+fallbackReturn = "stay"
+
+[icedos.ai-tools.pi-agent.settings.providers.opencode-free.modelOverrides]
+"deepseek-v4.1-flash-free".contextWindow = 332000
+"mimo-v2.6-flash-free".contextWindow = 332000
+
+[icedos.ai-tools.pi-agent.settings.extra]
+defaultThinkingLevel = "max"
+
+[icedos.ai-tools.pi-agent.skills]
+codeReview = true
+opencodeFreeReview = true

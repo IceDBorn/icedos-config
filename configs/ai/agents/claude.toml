@@ -1,0 +1,19 @@
+[[icedos.repositories]]
+url = "github:icedos/ai-tools"
+modules = ["claude-code"]
+
+[home-manager.users.ice.programs.claude-code.settings.enabledPlugins]
+"clangd-lsp@claude-plugins-official" = true
+"lua-lsp@claude-plugins-official" = true
+"php-lsp@claude-plugins-official" = true
+"pyright-lsp@claude-plugins-official" = true
+"rust-analyzer-lsp@claude-plugins-official" = true
+"typescript-lsp@claude-plugins-official" = true
+
+[home-manager.users.ice.programs.claude-code.lspServers.nixd]
+command = "nixd"
+extensionToLanguage = { ".nix" = "nix" }
+
+[icedos.ai-tools.claude-code]
+includeInIcedosGc = true
+sessionRetentionDays = 7

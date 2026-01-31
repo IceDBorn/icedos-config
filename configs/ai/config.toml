@@ -1,0 +1,23 @@
+[[icedos.repositories]]
+url = "github:icedos/ai-tools"
+# overrideUrl = "path:/mnt/storage/Projects/icedos/ai-tools"
+modules = [
+  "agent-relay",
+  "ai-accounts",
+  "alimit",
+  "code-intelligence",
+  "mcp-gateway",
+]
+
+[icedos.ai-tools.agent-relay]
+hopLimit = 100
+
+[icedos.system]
+packages = [
+  "clang-tools",
+  "lua-language-server",
+  "nixd",
+  "pyright",
+  "rust-analyzer",
+  "typescript-language-server",
+]
