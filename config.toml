@@ -1,0 +1,526 @@
+[[icedos.repositories]]
+url = "github:icedos/apps"
+# overrideUrl = "path:/home/ice/.code/icedos/apps"
+fetchOptionalDependencies = true
+modules = [
+  "btop",
+  "celluloid",
+  "gamescope",
+  "helium",
+  "lact",
+  "lsfg-vk",
+  "mangohud",
+  "me3",
+  "nautilus",
+  "ncdu",
+  "network-manager",
+  "obs",
+  "power-profiles-daemon",
+  "prefixer",
+  "proton-launch",
+  "protonvpn-cli",
+  "reigntweak",
+  "samba",
+  "scx",
+  "sd-inhibitor",
+  "simpmusic",
+  "steam",
+  "sunshine",
+  "tailscale",
+  "wolf",
+  "zed",
+  "zenergy",
+]
+
+[[icedos.repositories]]
+url = "github:icedos/cosmic"
+# overrideUrl = "path:/home/ice/.code/icedos/cosmic"
+modules = ["brightness-control"]
+fetchOptionalDependencies = true
+
+[[icedos.repositories]]
+url = "github:icedos/desktop"
+# overrideUrl = "path:/home/ice/.code/icedos/desktop"
+
+[[icedos.repositories]]
+url = "github:icedos/hardware"
+# overrideUrl = "path:/home/ice/.code/icedos/hardware"
+modules = [
+  "bluetooth",
+  "cachyos-kernel",
+  "disable-ipv6",
+  "kernel",
+  "openrgb",
+  "pipewire",
+  "radeon",
+  "ryzen",
+  "systemd-boot",
+  "uinput",
+  "upower",
+  "wake-on-lan",
+  "xpadneo",
+  "zfs",
+]
+
+[[icedos.repositories]]
+url = "github:icedos/tweaks"
+# overrideUrl = "path:/home/ice/.code/icedos/tweaks"
+modules = [
+  "cachyos",
+  "dmem",
+  "gaming",
+  "kernel",
+]
+
+[icedos.applications.btop]
+diskExclusions = ["/boot", "/home"]
+
+[icedos.applications.docker.daemonSettings]
+data-root = "/mnt/virtualisation/docker"
+
+[icedos.applications.git.users.ice]
+username = "IceDBorn"
+email = "git.outsider841@simplelogin.fr"
+
+[[icedos.applications.helium.profiles]]
+exec = "helium-discord"
+name = "Discord"
+sites = [
+  "https://discord.com/app",
+]
+
+[[icedos.applications.helium.profiles]]
+exec = "helium-element"
+name = "Element"
+sites = [
+  "https://develop.element.io",
+]
+
+[[icedos.applications.helium.profiles]]
+exec = "helium-proton"
+name = "Proton"
+sites = [
+  "https://drive.proton.me",
+  "https://lumo.proton.me",
+  "https://mail.proton.me",
+  "https://pass.proton.me",
+]
+
+[[icedos.applications.helium.profiles]]
+exec = "helium-sharkord"
+name = "Sharkord"
+sites = [
+  "https://sharkord.knp.one",
+]
+
+[icedos.applications.mangohud]
+fpsLimit = "0,144,60,30"
+
+[icedos.applications.kitty]
+hideDecorations = true
+
+[icedos.applications.me3.games.eldenring]
+profileVersion = "v1"
+disable_arxan = true
+start_online = true
+natives = [
+  { name = "convergence-alt-saves", path = "/mnt/games-ssd/games/er/natives/convergence/eldenring_alt_saves.dll" },
+  { name = "convergence-cmi", path = "/mnt/games-ssd/games/er/natives/convergence/CMI.dll" },
+  { name = "convergence-erdtools", path = "/mnt/games-ssd/games/er/natives/convergence/ErdTools.dll" },
+  { name = "convergence-erdyes", path = "/mnt/games-ssd/games/er/natives/convergence/erdyes.dll" },
+  { name = "convergence-scripts-exposer", path = "/mnt/games-ssd/games/er/natives/convergence/Scripts-Data-Exposer-FS.dll" },
+  { name = "convergence-transmogrify", path = "/mnt/games-ssd/games/er/natives/convergence/ertransmogrify.dll" },
+  { name = "disable-sharpening", path = "/mnt/games-ssd/games/er/natives/disable-sharpening.dll" },
+  { name = "increase-animation-distance", path = "/mnt/games-ssd/games/er/natives/increase-animation-distance.dll" },
+  { name = "no-fall-damage", path = "/mnt/games-ssd/games/er/natives/no-fall-damage.dll" },
+  { name = "practice-tool", path = "/mnt/games-ssd/games/er/natives/er-practice-tool.dll" },
+  { name = "remove-chromatic-aberration", path = "/mnt/games-ssd/games/er/natives/remove-chromatic-aberration.dll" },
+  { name = "remove-vignette", path = "/mnt/games-ssd/games/er/natives/remove-vignette.dll" },
+  { name = "seamless-coop", path = "/mnt/games-ssd/games/er/natives/seamless-coop/ersc.dll" },
+  { name = "ultrawide", path = "/mnt/games-ssd/games/er/natives/ultrawide.dll" },
+  { name = "unlock-fps", path = "/mnt/games-ssd/games/er/natives/unlock-fps.dll" },
+]
+packages = [
+  { id = "convergence", path = "/mnt/games-ssd/games/er/packages/convergence" },
+  { id = "fast-torrent", path = "/mnt/games-ssd/games/er/packages/fast-torrent" },
+  { id = "nightreign-movement-speed", path = "/mnt/games-ssd/games/er/packages/nightreign-movement-speed" },
+]
+
+[[icedos.applications.me3.games.eldenring.profiles]]
+name = "er"
+natives = [
+  "disable-sharpening",
+  "increase-animation-distance",
+  "remove-chromatic-aberration",
+  "remove-vignette",
+  "seamless-coop",
+  "ultrawide",
+  "unlock-fps",
+]
+
+[[icedos.applications.me3.games.eldenring.profiles]]
+name = "er-nr"
+dependencies = ["er"]
+natives = [
+  "no-fall-damage",
+  "practice-tool",
+]
+packages = [
+  "fast-torrent",
+  "nightreign-movement-speed",
+]
+
+[[icedos.applications.me3.games.eldenring.profiles]]
+name = "er-convergence"
+dependencies = ["er"]
+natives = [
+  "convergence-alt-saves",
+  "convergence-cmi",
+  "convergence-erdtools",
+  "convergence-erdyes",
+  "convergence-scripts-exposer",
+  "convergence-transmogrify",
+]
+packages = [
+  "convergence",
+]
+
+[icedos.applications.me3.games.nightreign]
+profileVersion = "v1"
+disable_arxan = true
+start_online = true
+natives = [
+  { name = "cl-server-redirector", path = "/mnt/games-ssd/games/nr/natives/cl_server_redirector.dll" },
+  { name = "disable-chromatic-aberration", path = "/mnt/games-ssd/games/nr/natives/disable-chromatic-aberration.dll" },
+  { name = "disable-sharpening", path = "/mnt/games-ssd/games/nr/natives/disable-sharpening.dll" },
+  { name = "disable-vignette", path = "/mnt/games-ssd/games/nr/natives/disable-vignette.dll" },
+  { name = "increase-animation-distance", path = "/mnt/games-ssd/games/nr/natives/increase-animation-distance.dll" },
+  { name = "seamless-coop", path = "/mnt/games-ssd/games/nr/natives/nrsc.dll", load_early = true },
+  { name = "storm-control", path = "/mnt/games-ssd/games/nr/natives/storm-control.dll", load_early = true },
+  { name = "ultrawide", path = "/mnt/games-ssd/games/nr/natives/ultrawide.dll" },
+  { name = "unlock-fps", path = "/mnt/games-ssd/games/nr/natives/unlock-fps.dll" },
+]
+packages = [
+  { id = "blue-filter-removal", path = "/mnt/games-ssd/games/nr/packages/blue-filter-removal" },
+  { id = "bots", path = "/mnt/games-ssd/games/nr/packages/bots" },
+  { id = "variations", path = "/mnt/games-ssd/games/nr/packages/variations/output" },
+]
+
+[[icedos.applications.me3.games.nightreign.profiles]]
+name = "nr"
+natives = [
+  "cl-server-redirector",
+  "disable-chromatic-aberration",
+  "disable-sharpening",
+  "disable-vignette",
+  "increase-animation-distance",
+  # "seamless-coop",
+  "ultrawide",
+  "unlock-fps",
+]
+packages = [
+  "blue-filter-removal",
+]
+
+[[icedos.applications.me3.games.nightreign.profiles]]
+name = "nr-storm-control"
+dependencies = ["nr"]
+natives = ["storm-control"]
+
+[[icedos.applications.me3.games.nightreign.profiles]]
+name = "nr-bots"
+dependencies = ["nr-storm-control"]
+packages = ["bots"]
+
+[[icedos.applications.me3.games.nightreign.profiles]]
+name = "nr-variations"
+dependencies = ["nr-storm-control"]
+packages = ["variations"]
+
+[icedos.applications.network-manager]
+applet = true
+
+[icedos.applications.power-profiles-daemon]
+profile = "performance"
+
+[icedos.applications.protonvpn-cli.connect]
+country = "BG"
+
+[icedos.applications.protonvpn-cli.desktopEntry]
+countries = ["BG", "GR", "RO"]
+
+[[icedos.applications.samba.shares]]
+forceUser = "ice"
+guestOk = true
+name = "Nvidia Shield Videos"
+path = "/mnt/virtualisation/videos/shield"
+readOnly = true
+
+[icedos.applications.scx]
+extraArgs = ["--performance"]
+
+[icedos.applications.sd-inhibitor.users.ice.watchers.pipewire]
+inputsToIgnore = ["Noise Canceling source", "Peak detect", "cava"]
+outputsToIgnore = ["Discord", "Element"]
+
+[icedos.applications.sd-inhibitor.users.ice.watchers.ports]
+inboundPorts = [22, 48100, 48200]
+
+[icedos.applications.steam]
+beta = true
+cpuUsageWorkaround = true
+downloadsWorkaround = true
+
+[icedos.applications.toolset]
+desktopEntries = true
+
+[icedos.applications.wolf]
+extraPackages = []
+extraVolumes = [
+  "/home/ice/.local/share/Steam/compatibilitytools.d:/home/retro/.steam/compatibilitytools.d",
+  "/home/ice/.local/share/Steam/steamapps:/home/retro/.steam/steam/steamapps",
+  "/mnt/games-hdd/steam:/home/retro/games-hdd",
+  "/mnt/games-ssd/steam:/home/retro/games-ssd",
+  "/mnt/virtualisation/steam:/home/retro/virtualisation",
+]
+stateFolder = "/mnt/virtualisation/wolf"
+
+[icedos.applications.zed]
+vim = true
+
+[icedos.applications.zed.lsp.taplo.settings.formatter]
+alignComments = false
+reorderKeys = false
+
+[icedos.desktop]
+autologinUser = "ice"
+defaultBrowser = "helium.desktop"
+defaultEditor = "dev.zed.Zed.desktop"
+wallpaper = "/home/ice/Pictures/wallpaper.jpg"
+
+[icedos.desktop.bookmarks]
+public = false
+templates = false
+
+[[icedos.desktop.entries]]
+id = "blanket"
+name = "Blanket"
+exec = "icedos pkgs run blanket"
+icon = "blanket"
+
+[icedos.desktop.stylix]
+enable = true
+disabledTargets = ["console", "kmscon"]
+
+[icedos.desktop.windows]
+maximizeButton = false
+minimizeButton = false
+
+[icedos.desktop.cosmic]
+disableExcludedPackagesWarning = true
+excludeDefaultPackages = [
+  "cosmic-applibrary",
+  "cosmic-files",
+  "cosmic-initial-setup",
+  "cosmic-launcher",
+]
+
+[[icedos.desktop.cosmic.brightnessControl.schedules]]
+at = "09:00"
+brightness = 100
+
+[[icedos.desktop.cosmic.brightnessControl.schedules]]
+at = "20:30"
+brightness = 75
+
+[icedos.desktop.cosmic.panel.plugins]
+right = [
+  "com.system76.CosmicAppletStatusArea",
+  "com.system76.CosmicAppletInputSources",
+  "com.system76.CosmicAppletBluetooth",
+  "com.system76.CosmicAppletAudio",
+  "com.system76.CosmicAppletNetwork",
+  "com.system76.CosmicAppletNotifications",
+  "com.system76.CosmicAppletTime",
+  "com.system76.CosmicAppletPower",
+]
+
+[icedos.desktop.cosmic.input.mouse]
+mouseSpeed = 65
+
+[[icedos.desktop.cosmic.input.keyboard.shortcuts]]
+action = "Close"
+keys = ["Super+semicolon"]
+
+[[icedos.desktop.cosmic.input.keyboard.shortcuts]]
+action = "Maximize"
+keys = ["Super+Greek_mu"]
+
+[[icedos.desktop.cosmic.input.keyboard.shortcuts]]
+action = "ToggleWindowFloating"
+keys = ["Super+g", "Super+Greek_gamma"]
+
+[[icedos.desktop.cosmic.input.keyboard.shortcuts]]
+action = "WorkspaceOverview"
+keys = ["Super+Greek_finalsmallsigma"]
+variant = "System"
+
+[[icedos.desktop.cosmic.input.keyboard.shortcuts]]
+command = "cosmic-screenshot"
+description = "Screenshot"
+keys = ["Super+p", "Super+Greek_pi"]
+variant = "Spawn"
+
+[[icedos.desktop.cosmic.input.keyboard.shortcuts]]
+command = "walker-applications"
+description = "Application launcher"
+keys = ["Super+r", "Super+Greek_rho"]
+variant = "Spawn"
+
+[[icedos.desktop.cosmic.input.keyboard.shortcuts]]
+command = "walker-clipboard"
+description = "Clipboard manager"
+keys = ["Super+v", "Super+Greek_omega"]
+variant = "Spawn"
+
+[[icedos.desktop.cosmic.input.keyboard.shortcuts]]
+command = "walker-emojis"
+description = "Emoji picker"
+keys = ["Super+e", "Super+Greek_epsilon"]
+variant = "Spawn"
+
+[[icedos.desktop.cosmic.input.keyboard.shortcuts]]
+command = "killall -9 .cosmic-panel-wrapped .walker-wrapped"
+description = "Soft Reset"
+keys = ["Ctrl+Alt+Delete"]
+variant = "Spawn"
+
+[icedos.desktop.cosmic.patches.cosmic-applets]
+boldPanelText = true
+stableClockWidth = true
+steamGameIconMatcher = true
+
+[icedos.desktop.cosmic.patches.cosmic-comp]
+dmemForegroundBooster = true
+fixTilingHintClipping = true
+perWindowKeyboardLayout = true
+
+[icedos.desktop.cosmic.patches.cosmic-osd]
+keyboardLayoutOsd = true
+osdTimeoutMs = 750
+
+[icedos.desktop.cosmic.patches.cosmic-notifications]
+windowMatchingRoundness = true
+
+[icedos.desktop.cosmic.patches.xdg-desktop-portal-cosmic]
+useGtkFilePicker = true
+
+[icedos.desktop.cosmic.power.lock]
+disableMonitorsOnLockKeybind = true
+
+[icedos.desktop.cosmic.sound]
+showMediaControlsInPanel = true
+
+[icedos.desktop.cosmic.windowManagement.focus]
+cursorFollowsFocus = true
+followsCursor = true
+
+[icedos.desktop.cosmic.workspaces]
+tile = true
+
+[icedos.desktop.cosmic.users.ice]
+
+[icedos.desktop.users.ice]
+startupScript = """
+  sleep 1 &&
+  signal-desktop &
+"""
+
+[icedos.hardware]
+swapDevices = ["/swap/swapfile"]
+
+[icedos.hardware.bootloaders.systemd-boot]
+mountPoint = "/boot"
+
+[icedos.hardware.graphics.radeon]
+featureMask = "0xffffffff"
+
+[icedos.hardware.kernel]
+variant = "latest-lto-x86_64-v3"
+
+[[icedos.hardware.mounts]]
+path = "/"
+device = "/dev/mapper/luks-f71c56ea-2db0-47d2-b57c-21b8f7ea1b22"
+fsType = "btrfs"
+flags = ["compress=zstd", "nofail", "x-gvfs-show"]
+
+[[icedos.hardware.mounts]]
+path = "/home"
+device = "/dev/mapper/luks-f71c56ea-2db0-47d2-b57c-21b8f7ea1b22"
+fsType = "btrfs"
+flags = ["compress=zstd", "nofail"]
+
+[[icedos.hardware.mounts]]
+path = "/mnt/games-hdd"
+device = "games-hdd"
+fsType = "zfs"
+flags = ["nofail", "x-gvfs-show"]
+
+[[icedos.hardware.mounts]]
+path = "/mnt/games-ssd"
+device = "games-ssd"
+fsType = "zfs"
+flags = ["nofail", "x-gvfs-show"]
+
+[[icedos.hardware.mounts]]
+path = "/mnt/virtualisation"
+device = "virtualisation"
+fsType = "zfs"
+flags = ["nofail", "x-gvfs-show"]
+
+[icedos.hardware.network]
+firewall = false
+
+[icedos.hardware.network.wakeOnLan]
+interfaces = ["enp9s0"]
+
+[icedos.hardware.pipewire.noiseCancellation]
+enable = true
+
+[icedos.tweaks.cachyos]
+useAdios = true
+useCachyosZramProfile = true
+
+[icedos.users.ice]
+description = "IceDBorn"
+
+[icedos.system]
+packages = [
+  "faugus-launcher",
+  "signal-desktop",
+]
+version = "25.11"
+
+[icedos.system.buildVm]
+cores = 6
+memory = 8192
+
+[[icedos.system.overlays.fromChannel]]
+url = "github:nixos/nixpkgs/master"
+packages = []
+
+[[icedos.system.overlays.fromChannel]]
+url = "github:nixos/nixpkgs/nixos-25.11"
+packages = []
+
+[[icedos.system.overlays.fromChannel]]
+url = "github:nixos/nixpkgs/nixos-unstable-small"
+packages = []
+
+[[icedos.system.overlays.fromChannel]]
+url = "github:nixos/nixpkgs/nixpkgs-unstable"
+packages = []
+
+[[icedos.system.overlays.fromChannel]]
+url = "github:nixos/nixpkgs/staging-next"
+packages = []
