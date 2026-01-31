@@ -1,0 +1,4 @@
+[[icedos.repositories]]
+url = "github:icedborn/dtek-tools"
+# overrideUrl = "path:/home/ice/.code/icedos/dtek-tools"
+modules = ["ddev", "opencart-mcp"]

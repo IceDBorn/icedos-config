@@ -1,0 +1,29 @@
+[icedos.users.ice]
+description = "IceDBorn"
+
+[icedos.system]
+packages = [
+  "anydesk",
+  "beekeeper-studio",
+  "proton-vpn-cli",
+  "teamviewer",
+]
+permittedInsecurePackages = ["beekeeper-studio-6.0.5"]
+version = "25.11"
+
+[icedos.system.bootloaders.systemd-boot]
+mountPoint = "/boot"
+
+[icedos.system.cache]
+enable = true
+pinInputs = true
+
+[icedos.system.git.users.ice]
+username = "IceDBorn"
+email = "git.outsider841@simplelogin.fr"
+
+[icedos.system.toolset]
+desktopEntries = true
+
+[icedos.system.zsh.aliases]
+update = "cd /home/ice/.code/icedos && icedos git rpull && icedos rebuild --update"

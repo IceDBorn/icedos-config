@@ -1,0 +1,15 @@
+[icedos.applications.zed]
+vim = true
+
+[icedos.applications.zed.copySelectionLocation]
+enable = true
+
+[icedos.applications.zed.languages.PHP]
+language_servers = ["intelephense"]
+
+[icedos.applications.zed.lsp.intelephense.settings.format]
+braces = "k&r"
+
+[icedos.applications.zed.lsp.taplo.settings.formatter]
+alignComments = false
+reorderKeys = false

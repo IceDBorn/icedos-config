@@ -1,0 +1,34 @@
+[[icedos.repositories]]
+url = "github:icedos/desktop"
+# overrideUrl = "path:/home/ice/.code/icedos/desktop"
+
+[icedos.desktop]
+autologinUser = "ice"
+wallpaper = "/home/ice/Pictures/wallpaper.jpg"
+
+[icedos.desktop.applications.browser]
+name = "helium.desktop"
+
+[icedos.desktop.applications.editor]
+name = "dev.zed.Zed.desktop"
+
+[icedos.desktop.bookmarks]
+public = false
+templates = false
+
+[icedos.desktop.windows.focus]
+delay = 0
+followsMouse = true
+
+[icedos.desktop.xdg-desktop-portal]
+forceGtkFilePicker = true
+
+[icedos.desktop.stylix]
+disabledTargets = ["console", "kmscon", "zed"]
+
+[icedos.desktop.windows]
+maximizeButton = false
+minimizeButton = false
+
+[icedos.desktop.users.ice]
+startupScript = "helium-social"
