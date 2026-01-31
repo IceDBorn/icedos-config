@@ -1,0 +1,231 @@
+[[icedos.repositories]]
+url = "github:icedos/apps"
+fetchOptionalDependencies = true
+modules = [
+  "btop",
+  "celluloid",
+  "codium",
+  "docker",
+  "helium",
+  "input-remapper",
+  "lact",
+  "nautilus",
+  "ncdu",
+  "network-manager",
+  "obs",
+  "scx",
+  "zed",
+]
+
+[icedos.applications]
+defaultBrowser = "helium.desktop"
+defaultEditor = "dev.zed.Zed.desktop"
+extraPackages = [
+  "anydesk",
+  "appimage-run",
+  "beekeeper-studio",
+  "epiphany",
+  "gimp3",
+  "teamviewer",
+]
+insecurePackages = ["beekeeper-studio-5.5.5"]
+
+[icedos.applications.codium.users.ice]
+formatOnPaste = false
+formatOnSave = false
+zoomLevel = 0.3
+
+[icedos.applications.docker]
+requireSudo = false
+
+[icedos.applications.git.users.ice]
+username = "IceDBorn"
+email = "git.outsider841@simplelogin.fr"
+
+[icedos.applications.kitty]
+hideDecorations = true
+
+[icedos.applications.network-manager]
+applet = true
+
+[icedos.applications.scx]
+extraArgs = ["--perf", "1024"]
+
+[icedos.applications.zed]
+extensions = [
+  "git-firefly",
+  "html",
+  "php",
+  "sql",
+  "twig",
+]
+fontSize = 14
+fhs = true
+vim = true
+
+[icedos.applications.zed.languages.PHP]
+language_servers = ["intelephense"]
+
+[icedos.applications.zed.lsp.intelephense.settings.format]
+braces = "k&r"
+
+[[icedos.applications.helium.profiles]]
+exec = "helium-social"
+name = "Helium Social"
+sites = [
+  "https://dtekteam.slack.com",
+  "https://gmail.com",
+  "https://lumo.proton.me",
+  "https://teams.microsoft.com/v2",
+]
+
+[[icedos.repositories]]
+url = "github:icedos/cosmic"
+fetchOptionalDependencies = true
+
+[icedos.desktop.cosmic]
+disableExcludedPackagesWarning = true
+excludeDefaultPackages = [
+  "cosmic-applibrary",
+  "cosmic-files",
+  "cosmic-initial-setup",
+  "cosmic-launcher",
+]
+
+[icedos.desktop.cosmic.wallpaper]
+wallpaper = "path:/home/ice/Pictures/wallpaper.jpg"
+
+[icedos.desktop.cosmic.windowManagement.controls]
+activeHint = true
+maximize = false
+minimize = false
+
+[icedos.desktop.cosmic.windowManagement.focus]
+cursorFollowsFocus = true
+followsCursor = true
+
+[icedos.desktop.cosmic.input.mouse]
+mouseSpeed = 60
+
+[[icedos.desktop.cosmic.input.keyboard.shortcuts]]
+action = "Close"
+keys = ["Super+semicolon"]
+
+[[icedos.desktop.cosmic.input.keyboard.shortcuts]]
+action = "Maximize"
+keys = ["Super+Greek_mu"]
+
+[[icedos.desktop.cosmic.input.keyboard.shortcuts]]
+action = "ToggleWindowFloating"
+keys = ["Super+g", "Super+Greek_gamma"]
+
+[[icedos.desktop.cosmic.input.keyboard.shortcuts]]
+command = "cosmic-screenshot"
+description = "Screenshot"
+keys = ["Super+p", "Super+Greek_pi"]
+variant = "Spawn"
+
+[[icedos.desktop.cosmic.input.keyboard.shortcuts]]
+command = "walker-emojis"
+description = "Emoji picker"
+keys = ["Super+e", "Super+Greek_epsilon"]
+variant = "Spawn"
+
+[[icedos.desktop.cosmic.input.keyboard.shortcuts]]
+command = "walker-clipboard"
+description = "Clipboard manager"
+keys = ["Super+v", "Super+Greek_omega"]
+variant = "Spawn"
+
+[[icedos.desktop.cosmic.input.keyboard.shortcuts]]
+command = "walker-applications"
+description = "Application launcher"
+keys = ["Super+r", "Super+Greek_rho"]
+variant = "Spawn"
+
+[icedos.desktop.cosmic.workspaces]
+tile = true
+
+[icedos.desktop.cosmic.users.ice]
+
+[[icedos.repositories]]
+url = "github:icedos/hardware"
+modules = [
+  "cachyos-kernel",
+  "disable-ipv6",
+  "kernel",
+  "mounts",
+  "radeon",
+  "ryzen",
+  "systemd-boot",
+]
+
+[icedos.hardware.bootloaders.systemd-boot]
+mountPoint = "/boot"
+
+[icedos.hardware.kernel]
+variant = "latest-lto-x86_64-v3"
+
+[[icedos.hardware.mounts]]
+path = "/"
+device = "/dev/mapper/luks-a54c1490-907b-40ed-ac32-e25a5f5e3afa"
+fsType = "btrfs"
+flags = ["compress=zstd", "nofail", "x-gvfs-show"]
+
+[[icedos.hardware.mounts]]
+path = "/mnt/storage"
+device = "/dev/disk/by-uuid/1424d8b8-ab24-4553-977a-05fc963f29a6"
+fsType = "btrfs"
+flags = ["compress=zstd", "nofail", "x-gvfs-show"]
+
+[icedos.hardware.network]
+firewall = false
+
+[[icedos.repositories]]
+url = "github:icedos/tweaks"
+modules = ["cachyos", "gaming", "kernel"]
+
+[icedos.users.ice]
+description = "IceDBorn"
+
+[icedos.desktop]
+autologinUser = "ice"
+
+[icedos.desktop.users.ice]
+startupScript = """
+  zed &
+  helium &
+  helium-social &
+"""
+
+[icedos.desktop.users.ice.idle.disableMonitors]
+seconds = 180
+
+[icedos.desktop.users.ice.idle.suspend]
+enable = false
+
+[icedos.system]
+version = "25.11"
+
+[[icedos.repositories]]
+url = "github:icedborn/dtek-tools"
+modules = ["ddev"]
+
+# [[icedos.system.channels]]
+# name = "master"
+# url = "github:nixos/nixpkgs/master"
+
+# [[icedos.system.channels]]
+# name = "small"
+# url = "github:nixos/nixpkgs/nixos-unstable-small"
+
+# [[icedos.system.channels]]
+# name = "unstable"
+# url = "github:nixos/nixpkgs/nixpkgs-unstable"
+
+# [[icedos.system.channels]]
+# name = "stable"
+# url = "github:nixos/nixpkgs/nixos-25.05"
+
+# [[icedos.repositories]]
+# url = "path:/home/ice/.code/icedos/tests"
