@@ -1,0 +1,35 @@
+[[icedos.repositories]]
+url = "github:icedos/ai-tools"
+modules = [
+  "basic-memory-mcp",
+  "chrome-devtools-mcp",
+  "context7-mcp",
+  "ddev-mcp",
+  "kwin-mcp",
+  "mcp-server",
+  "nixos-mcp",
+  "opencart-mcp",
+  "pagespeed-insights-mcp",
+  "plesk-mcp",
+]
+
+[home-manager.users.ice.programs.mcp]
+enable = true
+
+[icedos.ai-tools.chrome-devtools-mcp]
+executablePath = "/run/current-system/sw/bin/helium"
+
+[icedos.ai-tools.plesk-mcp.servers.dtekhost]
+host = "https://dtekhost.gr:8443"
+
+[icedos.ai-tools.plesk-mcp.servers.dtekhost01]
+host = "https://dtekhost01.gr:8443"
+
+[icedos.ai-tools.plesk-mcp.servers.dtekhost03]
+host = "https://dtekhost03.gr:8443"
+
+[icedos.ai-tools.plesk-mcp.servers.dtekhost04]
+host = "https://dtekhost04.gr:8443"
+
+[icedos.ai-tools.plesk-mcp.servers.dtekhost05]
+host = "https://dtekhost05.gr:8443"

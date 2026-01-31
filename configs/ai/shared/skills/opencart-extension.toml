@@ -1,0 +1,446 @@
+[home-manager.users.ice.programs.claude-code.skills]
+opencart-extension = '''
+---
+name: opencart-extension
+description: Use when writing, modifying, or reviewing OpenCart 3.x extension code — controllers, models, language files, Twig views, install/uninstall lifecycle, event handlers, DB queries, config management, or ocmod XML modifications.
+---
+
+# OpenCart Extension Development
+**Ask who the extension is credited to before writing any file** — the `@author` name and `@link` URL. Every PHP and JS file carries it and `install.xml` repeats it, so a wrong guess means rewriting everything. Examples below use `Your Name` and `https://github.com/username` as placeholders; the link may equally be `https://website.com/` or a `mailto:`. Never carry a byline over from another project.
+
+## Non-negotiables
+| Rule | §|
+|---|---|
+| Almost no comments. Never narrate, explain a call, or label a block | 13 |
+| No `use` imports in a namespaced file — fully qualify at point of use, **return types included** | 11 |
+| No `@version` in a docblock | 3 |
+| Integers are never quoted in SQL | 6 |
+| Never assign a language key into `$data` for your own template | 8 |
+| Always namespace `load->language()` in an event handler | 8 |
+| No abbreviations, in any name | 11 |
+| Align `key => value` in array literals; nothing else, ever | 11 |
+| Every async JS call is awaited, returned, or `void` | 14 |
+
+**Paired extensions** — the same code shipped under two names — take every change in both, in the same edit. Diff the trees afterwards with the naming normalised; only credits may differ. A fix applied to one and forgotten in the other is worse than no fix, because the two drift silently.
+
+---
+
+## 1. Structure
+```
+upload/
+  admin/
+    controller/extension/{type}/{name}.php
+    model/extension/{type}/{name}.php
+    language/{en-gb,el-gr}/extension/{type}/{name}.php
+    view/template/extension/{type}/{name}.twig
+    view/stylesheet/{name}.css
+    view/javascript/{name}.js
+  catalog/
+    controller/extension/{type}/{name}.php    event hooks only; omit if unused
+    model|language/…
+  system/library/{name}.php                   complex integrations only
+install.xml
+```
+
+`{type}` is `module`, `shipping`, `feed`, `payment`… `{name}` is snake_case. Admin-only extensions omit `catalog/` entirely.
+
+**Assets.** Anything beyond a few lines gets its own file named after the extension, always served with a version query:
+
+```php
+$this->document->addStyle('view/stylesheet/{name}.css?v=' . $this->{name}->version());
+```
+```twig
+<script type="text/javascript" src="view/javascript/{name}.js?v={{ version }}"></script>
+```
+
+Never inline a stylesheet; never omit the version. Page glue needing Twig values stays in a `<script>` at the foot of that template.
+
+**Splitting.** When a settings page grows tool tabs, each tab becomes its own controller in a subfolder, with matching language and template folders:
+
+```
+controller/extension/module/{name}/url.php   → ControllerExtensionModule{Name}Url
+language/en-gb/extension/module/{name}/url.php
+view/template/extension/module/{name}/url.twig
+```
+
+A leaf is a controller in its own right — own `ROUTE`, permissions, `json()` — not a partial. The parent maps tabs to leaves and loads each language into its own namespace, so `{{ urls.get('column_keyword') }}` cannot collide:
+
+```php
+private const TABS = ['urls' => 'url', 'missing' => 'missing', 'redirects' => 'redirect'];
+
+foreach (self::TABS as $tab => $route) {
+    $this->load->language(self::ROUTE . '/' . $route, $tab);
+}
+```
+
+Split a tab with its own actions and table; do not split a fieldset.
+
+---
+
+## 2. Constants
+```php
+private const ROUTE = 'extension/module/example';
+private const CODE = 'module_example';
+private const MODEL = 'model_extension_' . self::CODE;
+private const ERRORS = ['warning', 'title'];
+private const FIELDS = ['status', 'title', 'api_key'];
+private const EVENTS = [
+    'admin/view/common/column_left/before' => self::ROUTE . '/viewCommonColumnLeftBefore',
+    'admin/view/sale/order_info/after'     => self::ROUTE . '/viewSaleOrderInfoAfter',
+];
+```
+
+Always `private const`. `CODE` is `{type}_{name}` and matches `install.xml` `<code>`; `ROUTE` matches the file path. Reference as `self::X`, never by class name. `FIELDS` drives the settings loop; `ERRORS` drives the error loop.
+
+---
+
+## 3. Class declaration
+```php
+<?php
+
+/**
+ * Extension Name
+ * @author Your Name
+ * @link https://github.com/username
+ *
+ * @property Loader $load
+ * @property Config $config
+ * @property Cart\User $user
+ * @property ModelSettingSetting $model_setting_setting
+ * @property ModelExtensionModuleExample $model_extension_module_example
+ */
+class ControllerExtensionModuleExample extends Controller
+{
+```
+
+Blank line after `<?php`. Credits header is name, `@author`, `@link` — **no `@version`**; the version lives in `install.xml` and a `VERSION` constant. Declare every magic dependency as `@property`. Class name mirrors the file path; model properties are `model_` + path with underscores.
+
+---
+
+## 4. Methods and events
+Everything is typed, parameters and return.
+
+```php
+public function index(): void {}
+protected function validate(): bool {}
+public function getOrders(array $data = []): array {}
+private function getCost(array $products, array $profile): float {}
+```
+
+Event method names mirror the trigger in camelCase — `admin/view/sale/order_info/after` → `viewSaleOrderInfoAfter`. Signatures depend on hook type:
+
+```php
+public function viewCommonColumnLeftBefore(string $route = '', array &$data = []): void {}
+public function viewSaleOrderInfoAfter(string $route = '', array $args = [], string &$output = ''): void {}
+public function modelExtensionPaymentGetMethodAfter(string $route = '', array $args = [], array &$output = []): void {}
+public function modelCatalogProductAddProductAfter(string $route = '', array $args = [], int $product_id = 0): void {}
+```
+
+Prefer single-word action names — `brands`, `synced`, `refresh`, `push` — over `brandMapping`, `syncedProducts`, `refreshCatalog`. They are URL routes.
+
+---
+
+## 5. Install / uninstall
+Order is strict: permissions, database, events, settings. Phase markers are required here.
+
+```php
+public function install(): void
+{
+    // Permissions
+    $this->load->model('user/user_group');
+
+    $this->model_user_user_group->addPermission($this->user->getGroupId(), 'access', self::ROUTE);
+    $this->model_user_user_group->addPermission($this->user->getGroupId(), 'modify', self::ROUTE);
+
+    // Database
+    $this->load->model(self::ROUTE);
+
+    $this->{self::MODEL}->install();
+
+    // Events
+    $this->load->model('setting/event');
+
+    $this->model_setting_event->deleteEventByCode(self::CODE);
+
+    foreach (self::EVENTS as $trigger => $action) {
+        $this->model_setting_event->addEvent(self::CODE, $trigger, $action);
+    }
+
+    // Settings
+    $this->load->model('setting/setting');
+
+    $this->model_setting_setting->editSetting(self::CODE, array_merge([
+        self::CODE . '_status' => 0,
+    ], $this->model_setting_setting->getSetting(self::CODE)));
+}
+```
+
+`uninstall()` reverses it — permissions, database, events — and omits `deleteSetting()` to preserve config across a reinstall.
+
+`editSetting()` deletes every row for the code before writing, so defaults must be merged **under** what is stored, never over it. Reinstalling is how a schema migration is applied.
+
+Model side: `CREATE TABLE IF NOT EXISTS` plus a `migrate()` that checks `SHOW COLUMNS … LIKE` before each `ALTER`.
+
+---
+
+## 6. Database
+```php
+$query = $this->db->query("
+    SELECT * FROM `" . DB_PREFIX . "example_request`
+    WHERE `order_id` = {$order_id}
+      AND `status` = 1
+    LIMIT 1
+");
+
+$this->db->query("
+    UPDATE `" . DB_PREFIX . "example_request`
+    SET `region` = '" . $this->db->escape($region) . "'
+    WHERE `order_id` = {$order_id}
+");
+```
+
+Backtick every table and column, prepend `DB_PREFIX`. **Integers go in bare** — `{$order_id}`, `= 1`, `IN (" . implode(', ', array_map('intval', $ids)) . ")`. Quotes are for genuine strings, always through `db->escape()`. Results: `$query->row`, `$query->rows`, `$query->num_rows`; then `getLastId()`, `countAffected()`. No prepared statements — `escape()` is the mechanism.
+
+---
+
+## 7. Config
+```php
+$status = (int)$this->config->get(self::CODE . '_status');
+$title = $this->config->get(self::CODE . '_title')[(int)$this->config->get('config_language_id')] ?? '';
+```
+
+Keys are always `{CODE}_{field}`. Type-cast on every read. Per-language values are arrays keyed by `language_id`.
+
+---
+
+## 8. Language files
+```php
+$_ = [
+    // Heading
+    'heading_title'    => 'Extension Name',
+
+    // Text
+    'text_extension'   => 'Extensions',
+    'text_success'     => 'Success: You have successfully modified Extension Name!',
+    'text_edit'        => 'Edit Extension Name',
+
+    // Entry
+    'entry_status'     => 'Status',
+
+    // Error
+    'error_permission' => 'Warning: You do not have permission to modify Extension Name!',
+];
+```
+
+One `$_` array, grouped by prefix with section markers, pairs aligned. Prefixes: `heading_`, `text_`, `tab_`, `entry_`, `column_`, `button_`, `help_`, `error_`.
+
+Always include `heading_title`, `text_extension`, `text_success`, `text_edit`, `entry_status`, `error_permission`. `text_edit` is the panel heading, `heading_title` the page title. Never redefine core keys — `text_enabled`, `text_disabled`, `text_home`, `button_save`, `button_cancel`.
+
+**Never assign a language key into `$data`.** A plain `load->language()` makes every key available to the template already:
+
+```php
+$this->load->language(self::ROUTE);
+```
+```twig
+{{ heading_title }}
+{{ entry_status }}
+```
+
+Writing `$data['heading_title'] = $this->language->get('heading_title');` is noise that grows by a line per string. Use `$this->language->get()` in PHP only for strings going somewhere other than the template — a `$json` response, an exception, `sprintf()`.
+
+**Events are the exception, and must namespace.** Pass `self::CODE` as the second argument; without it your keys overwrite the host page's own and every extension on that hook fights over them:
+
+```php
+$this->load->language(self::ROUTE, self::CODE);
+
+$heading = $this->language->get(self::CODE)->get('heading_title');
+```
+
+The host template cannot reach your namespace, so a handler hands its strings over itself:
+
+```php
+foreach ($this->language->get(self::CODE)->data ?? [] as $key => $value) {
+    $data[$key] = $value;
+}
+```
+
+`$this->language->data ?? []` is the same loop against the shared pool, for a handler that loaded without a namespace. Prefer the namespaced form; the `?? []` degrades instead of fataling on someone else's page.
+
+---
+
+## 9. URLs and JSON
+Always the array form, always HTTPS:
+
+```php
+$this->url->link(self::ROUTE, ['user_token' => $this->session->data['user_token']], true);
+```
+
+Never `'user_token=' . $token`. Every controller with an AJAX action carries the same helper, named `json`:
+
+```php
+private function json(array $data): void
+{
+    $this->response->addHeader('Content-Type: application/json');
+    $this->response->setOutput(json_encode($data));
+}
+```
+
+---
+
+## 10. ocmod XML
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<modification>
+    <name>Extension Name</name>
+    <code>module_example</code>
+    <version>1.0</version>
+    <author>Your Name</author>
+    <link>https://github.com/username</link>
+
+    <file path="catalog/controller/product/{category,product}.php">
+        <operation error="log">
+            <search trim="true"><![CDATA[$data['breadcrumbs'] = array();]]></search>
+            <add position="before"><![CDATA[injected code]]></add>
+        </operation>
+    </file>
+</modification>
+```
+
+`<code>` matches `self::CODE`. `error` is `log` or `skip`; `position` is `before`, `after` or `replace`; `index` targets the nth match; `trim="true"` strips whitespace before matching. Paths accept globs and `*`. All content in CDATA.
+
+**ocmod matches per line.** A multi-line `<search>` silently never applies. Keep the search to one line and verify against the compiled file in `system/storage/modification/`.
+
+---
+
+## 11. Code style
+- 4 spaces PHP, 2 spaces Twig and JS. Max 120 chars PHP.
+- Short array syntax. `??` and `??=` over `isset`. `static function` when `$this` is unused.
+- No `goto`. No single-line control flow — every body is braced on its own lines.
+- UTF-8, LF.
+- **No `use` imports in a namespaced file.** Fully qualify at point of use: `\Registry $registry`, `/** @var \DB */`, `new \XMLWriter()`, and return types — `: \XMLWriter`. Own-namespace classes stay bare.
+- **Alignment:** only `key => value` inside an array literal. Constants, assignments, doc tags, argument defaults, SQL columns — one space, even when ten lines would line up. Aligned statements produce a whole-block diff when one name grows a character; an array reads as a table and does not.
+- **Naming:** variables and properties snake_case, methods camelCase, classes PascalCase, constants UPPER_SNAKE.
+- **No abbreviations**, in any name — variables, methods, config keys, language keys, columns, CSS classes, Twig variables. `$language_id` not `$lang_id`; also `$description`, `$category`, `$message`, `$timestamp`, `$quantity`, `$image`, `$button`, `$separator`. Acceptable only where the short form is no longer an abbreviation — `$id`, `$url`, `$db`, `$sql`, `$xml`, `$api` — or where OpenCart's schema forces it, in which case match the framework exactly.
+- **Loader, never `require_once`:** `$this->load->library('name')`, `$this->load->model(self::ROUTE)`.
+
+Group consecutive `load->language()`, `load->model()` and `document->` calls, blank line after each group.
+
+---
+
+## 12. Settings page
+Never redirect after save; redisplay with `$data['success']` inline. Phase markers are required.
+
+```php
+public function index(): void
+{
+    $this->load->language(self::ROUTE);
+
+    $this->document->setTitle($this->language->get('heading_title'));
+
+    $data = [];
+
+    // Save
+    if ($this->request->server['REQUEST_METHOD'] === 'POST' && $this->validate()) {
+        $this->load->model('setting/setting');
+
+        $this->model_setting_setting->editSetting(self::CODE, $this->request->post);
+
+        $data['success'] = $this->language->get('text_success');
+    }
+
+    // Errors
+    $data['errors'] = [];
+
+    foreach (self::ERRORS as $error) {
+        $data['errors'][$error] = $this->error[$error] ?? '';
+    }
+
+    // Breadcrumbs
+    $data['breadcrumbs'] = [
+        [
+            'text' => $this->language->get('text_home'),
+            'href' => $this->url->link('common/dashboard', ['user_token' => $this->session->data['user_token']], true),
+        ],
+        [
+            'text' => $this->language->get('text_extension'),
+            'href' => $cancel = $this->url->link('marketplace/extension', ['user_token' => $this->session->data['user_token'], 'type' => 'module'], true),
+        ],
+        [
+            'text' => $this->language->get('heading_title'),
+            'href' => $action = $this->url->link(self::ROUTE, ['user_token' => $this->session->data['user_token']], true),
+        ],
+    ];
+
+    $data['action'] = $action;
+    $data['cancel'] = $cancel;
+
+    // Fields
+    foreach (self::FIELDS as $field) {
+        $key = self::CODE . '_' . $field;
+        $data[$field] = $this->request->post[$key] ?? $this->config->get($key);
+    }
+
+    // Layout
+    $data['header'] = $this->load->controller('common/header');
+    $data['column_left'] = $this->load->controller('common/column_left');
+    $data['footer'] = $this->load->controller('common/footer');
+
+    $this->response->setOutput($this->load->view(self::ROUTE, $data));
+}
+```
+
+---
+
+## 13. Comments
+Write almost none. The reader knows PHP and does not need it narrated.
+
+A comment is justified only where the mechanism is opaque — a framework or browser quirk, an ordering constraint that looks arbitrary, a spec rule. Expect zero to two per file. When in doubt, delete it.
+
+```php
+// redirect() exits before output(), so a page cache would store an empty body.
+header('Location: ' . $url);
+```
+
+Never write: a docblock describing what a method does; a line restating the next line; an explanation of code that is not there; a block label; a past-tense verb (added, removed, changed, fixed); "this now handles"; an end-of-line comment. Never comment out code — delete it, git has it. Rationale belongs in the commit message.
+
+Not comments, and they stay: `@property`, `@var`, `@param`, `@return`; the credits header; language-file section markers; phase markers in `install()`, `uninstall()` and a settings `index()`. A marker names a phase of a fixed sequence — it never explains what the code under it does. Comments in this document annotate the document; do not copy them.
+
+Twig and SQL follow the same rule.
+
+---
+
+## 14. JavaScript
+ES6. `const` and `let`, never `var`. No jQuery for new code — it is loaded, so use `$` only for Bootstrap's `.modal()` and `.tab()`. Never wrap a script in `<!-- //-->`.
+
+Take exactly one global, named after the extension; the admin page is shared ground.
+
+```js
+const seo = {
+  post: async (url, params) => {
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {'Content-Type': 'application/x-www-form-urlencoded', 'X-Requested-With': 'XMLHttpRequest'},
+      body: params instanceof URLSearchParams ? params : new URLSearchParams(params || {})
+    });
+
+    return response.json();
+  }
+};
+```
+
+`X-Requested-With` is required — OpenCart controllers branch on it.
+
+**Every async call is awaited, returned, or `void`.** A bare call reads as a forgotten `await`:
+
+```js
+await reload();
+reload: () => load(build(true)),
+button.addEventListener('click', () => void load(url));
+```
+
+**Delegate handlers** for anything inside AJAX-loaded content, binding on a container that survives the swap. **Escape every Twig value** crossing into JS with `|e('js')`.
+
+Two Bootstrap 3 traps: `shown.bs.tab` is a jQuery event a native listener never sees, so hang tab loading off the anchor's `click`; tooltips are wired once on ready, so fetched content has none until re-initialised, and inside a scrolling container they need `container: 'body'`.
+
+Section 13 applies here without exception.
+'''

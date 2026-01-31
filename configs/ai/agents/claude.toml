@@ -1,0 +1,75 @@
+[[icedos.repositories]]
+url = "github:icedos/ai-tools"
+modules = [
+  "alimit",
+  "claude-code",
+  "code-intelligence",
+]
+
+# Local DDEV OpenCart projects; the server runs ddev in its working directory.
+[icedos.ai-tools.opencart-mcp.env]
+OPENCART_SSH_HOST = "ddev"
+
+[home-manager.users.ice.programs.claude-code.settings]
+attribution = { commit = "", pr = "" }
+autoCompactWindow = 300000
+autoDreamEnabled = false
+awaySummaryEnabled = false
+precomputeCompactionEnabled = false
+promptSuggestionEnabled = false
+remoteControlAtStartup = false
+# Drop claude.ai connectors (Claude Docs, Gmail, Calendar, Drive) from /mcp.
+env = { ENABLE_CLAUDEAI_MCP_SERVERS = "false" }
+
+# claude-icedos dropped its own `enabledPlugins` / `skills` / `mcpServers`
+# options in "rework: use upstream home manager solutions", so all three are set
+# through the upstream home-manager options below. `enabledPlugins` is an object
+# keyed `plugin@marketplace` (the old icedos option took a list and converted).
+[home-manager.users.ice.programs.claude-code.settings.enabledPlugins]
+"superpowers@claude-plugins-official" = true
+"caveman@caveman" = true
+# Code intelligence (LSP) plugins from the official marketplace. Each one only
+# wires Claude Code's built-in LSP tool to a language server binary that must
+# already be on PATH — the plugin never installs it, hence the matching entries
+# in `icedos.system.packages` below.
+"php-lsp@claude-plugins-official" = true
+"pyright-lsp@claude-plugins-official" = true
+"rust-analyzer-lsp@claude-plugins-official" = true
+"typescript-lsp@claude-plugins-official" = true
+
+
+
+# Claude-only MCP servers. Kept off the shared programs.mcp.servers registry
+# (configs/mcp.toml) on purpose — that registry is client-agnostic and would hand
+# these to opencode and prime-agent too. claude-icedos sets
+# `enableMcpIntegration = true`, so claude-code sees the registry *plus* these,
+# with these winning on a name clash.
+[home-manager.users.ice.programs.claude-code.mcpServers.perfex-crm]
+command = "nix-shell"
+args = ["-p", "nodejs", "--run", "node /home/ice/.code/dtek/mcp/perfex-crm-mcp/dist/index.js"]
+
+# `source` is a Nix fetcher, not Claude's own git/github marketplace source:
+# claude-icedos fetches the marketplace at build time and home-manager records
+# the resulting store path as `extraKnownMarketplaces.<name>.source =
+# { source = "directory"; path = <store>; }`, so Claude Code reads it from the
+# store instead of cloning at runtime. That means rev+hash are pinned here and a
+# marketplace update is a manual bump:
+#   nix-prefetch-url --unpack https://github.com/<owner>/<repo>/archive/<rev>.tar.gz
+[[icedos.ai-tools.claude-code.users.ice.marketplaces]]
+name = "claude-plugins-official"
+source = "fetchFromGitHub"
+owner = "anthropics"
+repo = "claude-plugins-official"
+rev = "8864c9d619547417e9bd9305df0b4fc078f89b08"
+hash = "sha256-c5vpzHdEDNQ47nhOfGp5gy7jE3gB/BoRYBe06lYjsVU="
+
+[[icedos.ai-tools.claude-code.users.ice.marketplaces]]
+name = "caveman"
+source = "fetchFromGitHub"
+owner = "JuliusBrussee"
+repo = "caveman"
+rev = "766dce6b1394ebb56a3090748d5a0240a5aefb36"
+hash = "sha256-NBq3XCbvvw89pHdSKr2z4KZWS4yaG+O0eR37SjJ8EMc="
+
+[icedos.applications.zed]
+terminalInitCommand = "claude"

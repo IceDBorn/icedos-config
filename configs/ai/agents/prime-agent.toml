@@ -1,0 +1,23 @@
+[[icedos.repositories]]
+url = "github:icedos/ai-tools"
+modules = ["prime-agent"]
+
+[icedos.ai-tools.prime-agent]
+includeInIcedosGc = true
+sessionRetentionDays = 7
+
+[icedos.ai-tools.prime-agent.default]
+model = "big-pickle"
+provider = "opencode"
+
+[icedos.ai-tools.prime-agent.settings.providers.opencode.modelOverrides.big-pickle]
+contextWindow = 200000
+
+[icedos.ai-tools.prime-agent.extensions.context-language-models]
+enable = true
+
+[icedos.ai-tools.prime-agent.extensions.context-window-cap]
+enable = true
+
+[icedos.ai-tools.prime-agent.extensions.prompt-suggestions]
+enable = true

@@ -1,0 +1,58 @@
+[home-manager.users.ice.programs.claude-code.skills]
+plesk = '''
+---
+name: plesk
+description: Use when deploying a site, running commands, or inspecting files on a dtek Plesk server (dtekhost, dtekhost01, 03, 04, 05) through the plesk-dtekhost* MCP servers. Covers finding a domain, the Plesk Git deploy flow, and server-side gotchas.
+---
+
+# Plesk servers (plesk-dtekhost* MCP)
+
+Each server has its own MCP: `plesk-dtekhost`, `plesk-dtekhost01`, `-03`, `-04`, `-05`. "Deploy on 04" means `plesk-dtekhost04`.
+Tools per server: `exec`, `upload`, `api_call`, `api_help`, `api_list`, `api_list_tags`.
+
+If the tools are missing from the session, they are deferred or the server is disabled. Load them with ToolSearch (`select:mcp__plugin_hm_plesk-dtekhost04__exec`). If ToolSearch finds nothing, ask the user to enable the server in `/mcp`.
+
+## exec
+
+- `command` is an argv array. Wrap in `["bash", "-c", "..."]` for pipes, `cd` or `;`. Root context: never `bash -lc` (prints a banner).
+- The whole command, stdin and env must stay under about 740 characters. Split long work into several calls, or `upload` a script and run it.
+- `upload` writes a temp file as `0600 psaadm:psaadm`. Move it, then set owner `<sysuser>:psacln` and mode `0644` for site files.
+
+## Find a site
+
+```bash
+plesk bin site --list | grep -i <name>
+ls /var/www/vhosts/<domain>/            # httpdocs, git, logs, DB dump zips
+stat -c '%U:%G' /var/www/vhosts/<domain>/httpdocs   # system user, e.g. theboxgallery.gr_dxmgv2w498o
+```
+
+Known: `theboxgallery.gr` is on dtekhost04.
+
+## Deploy (Plesk Git extension)
+
+Sites deploy from `git.dtek.gr` through the Plesk Git extension, not a git checkout. `httpdocs` has no `.git`, so `git pull` there fails. The bare repo is `/var/www/vhosts/<domain>/git/<repo>.git`.
+
+1. Push the commit to the remote branch first.
+2. Inspect the repo settings (deployment path, mode, branch):
+   ```bash
+   plesk ext git --list                                   # every repo on the server
+   plesk ext git --info -domain <domain> -name <repo>.git
+   ```
+3. Fetch and confirm the head is the pushed commit:
+   ```bash
+   plesk ext git --fetch -domain <domain> -name <repo>.git
+   plesk ext git --get-last-commit -domain <domain> -name <repo>.git
+   ```
+4. Deploy into the deployment path (usually `/httpdocs`), then `ls -l` the changed files to confirm the new mtime:
+   ```bash
+   plesk ext git --deploy -domain <domain> -name <repo>.git
+   ```
+
+Repos use `Deployment mode: manual`, so a push alone deploys nothing. Post-deployment actions are disabled, so deploy runs no build or cache step.
+
+## After deploy
+
+- A new OpenCart extension still needs Extensions > (type) > Install in the admin. Deploy copies files only and never touches the database.
+- Verify the storefront from the local machine, not the server. `curl https://<domain>/` run on the server returns 403 even with a browser user agent, while the same request from outside returns 200.
+- Apache errors are in `/var/www/vhosts/<domain>/logs/error_log`. `AH10411 Rewritten query string contains control characters` lines are bot noise.
+'''
