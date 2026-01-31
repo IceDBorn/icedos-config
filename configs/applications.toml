@@ -1,0 +1,36 @@
+[[icedos.repositories]]
+url = "github:icedos/apps"
+# overrideUrl = "path:/home/ice/.code/icedos/apps"
+fetchOptionalDependencies = true
+modules = [
+  "btop",
+  "celluloid",
+  "helium",
+  "lact",
+  "nautilus",
+  "ncdu",
+  "opencode",
+  "prime-agent",
+  "tailscale",
+  "walker",
+  "zed",
+]
+
+[icedos.applications.btop]
+diskExclusions = ["/boot", "/home"]
+
+[icedos.applications.kitty]
+hideDecorations = true
+
+[icedos.applications.zed]
+vim = true
+
+[icedos.applications.zed.languages.PHP]
+language_servers = ["intelephense"]
+
+[icedos.applications.zed.lsp.intelephense.settings.format]
+braces = "k&r"
+
+[icedos.applications.zed.lsp.taplo.settings.formatter]
+alignComments = false
+reorderKeys = false

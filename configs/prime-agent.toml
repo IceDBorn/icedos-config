@@ -1,0 +1,3 @@
+[icedos.applications.prime-agent]
+defaultProvider = "opencode"
+defaultModel = "big-pickle"
