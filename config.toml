@@ -1,0 +1,254 @@
+[[icedos.repositories]]
+url = "github:icedos/apps"
+# overrideUrl = "path:/home/ice/.code/icedos/apps"
+fetchOptionalDependencies = true
+modules = [
+  "btop",
+  "celluloid",
+  "helium",
+  "lact",
+  "nautilus",
+  "ncdu",
+  "network-manager",
+  "obs",
+  "power-profiles-daemon",
+  "scx",
+  "tailscale",
+  "zed",
+]
+
+[icedos.applications.docker]
+requireSudo = false
+
+[icedos.applications.git.users.ice]
+username = "IceDBorn"
+email = "git.outsider841@simplelogin.fr"
+
+[icedos.applications.kitty]
+hideDecorations = true
+
+[icedos.applications.network-manager]
+applet = true
+
+[icedos.applications.scx]
+extraArgs = ["--performance"]
+
+[icedos.applications.zed]
+extensions = [
+  "git-firefly",
+  "html",
+  "php",
+  "sql",
+  "twig",
+]
+vim = true
+
+[icedos.applications.zed.font]
+size = 14
+
+[icedos.applications.zed.languages.PHP]
+language_servers = ["intelephense"]
+
+[icedos.applications.zed.lsp.intelephense.settings.format]
+braces = "k&r"
+
+[[icedos.applications.helium.profiles]]
+exec = "helium-social"
+name = "Dtek"
+sites = [
+  "https://claude.ai/settings/usage",
+  "https://crm.dtek.gr/admin",
+  "https://dtekteam.slack.com",
+  "https://gmail.com",
+  "https://mail.zoho.eu/zm",
+  "https://teams.microsoft.com/v2",
+]
+
+[icedos.applications.toolset]
+desktopEntries = true
+
+[[icedos.repositories]]
+url = "github:icedos/cosmic"
+# overrideUrl = "path:/home/ice/.code/icedos/cosmic"
+fetchOptionalDependencies = true
+
+[icedos.desktop.cosmic]
+disableExcludedPackagesWarning = true
+excludeDefaultPackages = [
+  "cosmic-applibrary",
+  "cosmic-files",
+  "cosmic-initial-setup",
+  "cosmic-launcher",
+]
+
+[icedos.desktop.cosmic.panel.plugins]
+right = [
+  "com.system76.CosmicAppletStatusArea",
+  "com.system76.CosmicAppletInputSources",
+  "com.system76.CosmicAppletBluetooth",
+  "com.system76.CosmicAppletAudio",
+  "com.system76.CosmicAppletNetwork",
+  "com.system76.CosmicAppletNotifications",
+  "com.system76.CosmicAppletTime",
+  "com.system76.CosmicAppletPower",
+]
+
+[icedos.desktop.cosmic.input.mouse]
+mouseSpeed = 65
+
+[[icedos.desktop.cosmic.input.keyboard.shortcuts]]
+action = "Close"
+keys = ["Super+semicolon"]
+
+[[icedos.desktop.cosmic.input.keyboard.shortcuts]]
+action = "Maximize"
+keys = ["Super+Greek_mu"]
+
+[[icedos.desktop.cosmic.input.keyboard.shortcuts]]
+action = "ToggleWindowFloating"
+keys = ["Super+g", "Super+Greek_gamma"]
+
+[[icedos.desktop.cosmic.input.keyboard.shortcuts]]
+action = "WorkspaceOverview"
+keys = ["Super+Greek_finalsmallsigma"]
+variant = "System"
+
+[[icedos.desktop.cosmic.input.keyboard.shortcuts]]
+command = "cosmic-screenshot"
+description = "Screenshot"
+keys = ["Super+p", "Super+Greek_pi"]
+variant = "Spawn"
+
+[[icedos.desktop.cosmic.input.keyboard.shortcuts]]
+command = "walker-applications"
+description = "Application launcher"
+keys = ["Super+r", "Super+Greek_rho"]
+variant = "Spawn"
+
+[[icedos.desktop.cosmic.input.keyboard.shortcuts]]
+command = "walker-clipboard"
+description = "Clipboard manager"
+keys = ["Super+v", "Super+Greek_omega"]
+variant = "Spawn"
+
+[[icedos.desktop.cosmic.input.keyboard.shortcuts]]
+command = "walker-emojis"
+description = "Emoji picker"
+keys = ["Super+e", "Super+Greek_epsilon"]
+variant = "Spawn"
+
+[[icedos.desktop.cosmic.input.keyboard.shortcuts]]
+command = "killall -9 .cosmic-panel-wrapped .walker-wrapped"
+description = "Soft Reset"
+keys = ["Ctrl+Alt+Delete"]
+variant = "Spawn"
+
+[icedos.desktop.cosmic.patches.cosmic-applets]
+boldPanelText = true
+centerPanelText = true
+stableClockWidth = true
+steamGameIconMatcher = true
+
+[icedos.desktop.cosmic.patches.cosmic-comp]
+dmemForegroundBooster = true
+fixTilingHintClipping = true
+perWindowKeyboardLayout = true
+
+[icedos.desktop.cosmic.patches.cosmic-osd]
+keyboardLayoutOsd = true
+osdTimeoutMs = 750
+
+[icedos.desktop.cosmic.patches.cosmic-notifications]
+windowMatchingRoundness = true
+
+[icedos.desktop.cosmic.patches.xdg-desktop-portal-cosmic]
+useGtkFilePicker = true
+
+[icedos.desktop.cosmic.power.lock]
+disableMonitorsOnLockKeybind = true
+
+[icedos.desktop.cosmic.sound]
+showMediaControlsInPanel = true
+
+[icedos.desktop.cosmic.windowManagement.focus]
+cursorFollowsFocus = true
+followsCursor = true
+
+[icedos.desktop.cosmic.workspaces]
+tile = true
+
+[icedos.desktop.cosmic.users.ice]
+
+[[icedos.repositories]]
+url = "github:icedos/hardware"
+# overrideUrl = "path:/home/ice/.code/icedos/hardware"
+modules = [
+  # "cachyos-kernel",
+  "disable-ipv6",
+  "kernel",
+  "radeon",
+  "ryzen",
+  "systemd-boot",
+]
+
+[icedos.hardware.bootloaders.systemd-boot]
+mountPoint = "/boot"
+
+[icedos.hardware.kernel]
+# variant = "latest-lto-x86_64-v3"
+variant = "latest"
+
+[icedos.hardware.network]
+firewall = false
+
+[[icedos.repositories]]
+url = "github:icedos/tweaks"
+# overrideUrl = "path:/home/ice/.code/icedos/tweaks"
+modules = ["cachyos", "gaming", "kernel"]
+
+[icedos.tweaks.cachyos]
+useAdios = true
+useCachyosZramProfile = true
+
+[[icedos.repositories]]
+url = "github:icedborn/dtek-tools"
+# overrideUrl = "path:/home/ice/.code/icedos/dtek-tools"
+modules = ["ddev", "opencart-mcp"]
+
+[icedos.users.ice]
+description = "IceDBorn"
+
+[[icedos.repositories]]
+url = "github:icedos/desktop"
+# overrideUrl = "path:/home/ice/.code/icedos/desktop"
+
+[icedos.desktop]
+autologinUser = "ice"
+defaultBrowser = "helium.desktop"
+defaultEditor = "dev.zed.Zed.desktop"
+
+[icedos.desktop.bookmarks]
+public = false
+templates = false
+
+[icedos.desktop.windows]
+maximizeButton = false
+minimizeButton = false
+
+[icedos.desktop.stylix]
+enable = true
+
+[icedos.desktop.users.ice]
+startupScript = """
+  zed &
+  helium &
+  helium-social &
+"""
+
+[icedos.system]
+packages = [
+  "anydesk",
+  "beekeeper-studio",
+  "teamviewer",
+]
+version = "25.11"
