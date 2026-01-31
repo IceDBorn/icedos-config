@@ -1,0 +1,71 @@
+[[icedos.repositories]]
+url = "github:icedos/ai-tools"
+modules = ["claude-code"]
+
+[home-manager.users.ice.programs.claude-code]
+context = """
+# Environment Check Handling
+
+When you see `[ENV-CHECK]` in SessionStart hook output:
+
+- **status=all-ok**: Do nothing, proceed normally.
+- **marketplace-missing**: Run `claude plugins install superpowers@claude-plugins-official` and inform the user.
+- **superpowers-not-installed**: Run `claude plugins install superpowers@claude-plugins-official` and inform the user.
+- **mcp-symlink-created** or **mcp-symlink-fixed**: The script already handled this and restarted Claude. No action needed.
+- **mcp-file-exists-not-symlink**: A project has its own `.mcp.json` (not a symlink). This is fine, leave it alone.
+
+Do not mention env-check results to the user unless there are unresolved issues.
+
+# NixOS: Missing Binaries
+
+This is a NixOS system. When a command or binary is not found (e.g., python3, jq, imagemagick, etc.), use `nix-shell -p <package> --run "..."` to run it ephemerally. Never report a tool as unavailable without trying nix-shell first.
+
+# Always-active rules
+
+@~/.claude/rules/unslop.md
+@~/.claude/rules/comment-rules.md
+@~/.claude/rules/git-commits.md
+@~/.claude/rules/clean-leftovers.md
+"""
+
+[home-manager.users.ice.programs.claude-code.settings]
+enabledPlugins = { "superpowers@claude-plugins-official" = true, "caveman@caveman" = true, "clangd-lsp@claude-plugins-official" = true, "lua-lsp@claude-plugins-official" = true, "pyright-lsp@claude-plugins-official" = true, "rust-analyzer-lsp@claude-plugins-official" = true, "typescript-lsp@claude-plugins-official" = true }
+remoteControlAtStartup = false
+autoCompactWindow = 300000
+promptSuggestionEnabled = false
+awaySummaryEnabled = false
+autoDreamEnabled = false
+precomputeCompactionEnabled = false
+env = { ENABLE_CLAUDEAI_MCP_SERVERS = "false" }
+attribution = { commit = "", pr = "" }
+
+[home-manager.users.ice.programs.claude-code.lspServers.nixd]
+command = "nixd"
+extensionToLanguage = { ".nix" = "nix" }
+
+[home-manager.users.ice.programs.claude-code.mcpServers.perfex-crm]
+command = "nix-shell"
+args = ["-p", "nodejs", "--run", "node /home/ice/.code/dtek/mcp/perfex-crm-mcp/dist/index.js"]
+
+[icedos.ai-tools.claude-code]
+includeInIcedosGc = true
+sessionRetentionDays = 7
+
+[[icedos.ai-tools.claude-code.users.ice.marketplaces]]
+name = "claude-plugins-official"
+source = "fetchFromGitHub"
+owner = "anthropics"
+repo = "claude-plugins-official"
+rev = "dabf346e1b4808aa5a37b29b0bae6d94f26e1ebc"
+hash = "sha256-5gRK7XL1dlfdTXeSUJa8DNUxSl7goXm6S8+mU6Zprj0="
+
+[[icedos.ai-tools.claude-code.users.ice.marketplaces]]
+name = "caveman"
+source = "fetchFromGitHub"
+owner = "JuliusBrussee"
+repo = "caveman"
+rev = "c72984e4392c7a154e55c11dbf445f01ce5c35d4"
+hash = "sha256-ionQQRJ4M4stHmrXZM5MFU10AOj8WI9tkE4H5pep0qw="
+
+[icedos.ai-tools.opencart-mcp.env]
+OPENCART_SSH_HOST = "ddev"

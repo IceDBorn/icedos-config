@@ -1,0 +1,56 @@
+[icedos.ai-tools.skills]
+memory-first = '''
+---
+name: memory-first
+description: Use ALWAYS — persist all knowledge to Basic Memory MCP before and after every task. Never rely on context window alone.
+---
+
+# Memory-First Agent Behavior
+
+## Before Starting Any Work
+
+1. `basic-memory_search_notes(query="topic")` — check if you already know this
+2. `basic-memory_recent_activity(timeframe="3d")` — see what recently changed
+3. `basic-memory_build_context(url="memory://project/notes")` — load relevant context
+
+## After Finishing Work
+
+Always save outcomes:
+```
+basic-memory_write_note(
+  title="Topic Title",
+  content="...",
+  directory="projects/relevant-project"
+)
+```
+
+Use `basic-memory_edit_note` to update existing notes instead of creating duplicates.
+
+## When to Save
+
+Save a note after any of these:
+- Decisions made (architecture, tooling, design tradeoffs)
+- Bugs found and their root causes
+- User preferences and project conventions
+- Configuration changes and their rationale
+- Anything that took >2 tool calls to figure out
+
+## How
+
+- Write notes in the format from the `memory-notes` skill.
+- Resume earlier work with the `memory-continue` skill.
+- Save where a thread landed with the `memory-capture` skill.
+
+## Tool Usage Priority (never skip)
+
+1. **Basic Memory** — check and save knowledge first
+2. **MCP tools** — use domain-specific MCPs before generic tools
+3. **Skills** — load via `skill` tool if task matches
+4. **Search tools** — search before acting, don't assume
+5. **File tools** — Read/Grep/Glob only when MCPs can't help
+6. **Bash** — absolute last resort
+
+## Key Rule
+
+**NEVER rely on your own context window as the sole memory.** Always persist to Basic Memory so knowledge survives across sessions.
+'''

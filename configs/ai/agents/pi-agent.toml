@@ -1,0 +1,106 @@
+[[icedos.repositories]]
+url = "github:icedos/ai-tools"
+modules = ["pi-agent"]
+
+[icedos.ai-tools.pi-agent.default]
+ provider = "opencode-free"
+ model = "big-pickle"
+
+[icedos.ai-tools.pi-agent.extensions]
+opencodeFree = true
+
+[icedos.ai-tools.pi-agent.extensions.context-language-models]
+enable = true
+
+[icedos.ai-tools.pi-agent.extensions.context-window-cap]
+enable = true
+
+[icedos.ai-tools.pi-agent.extensions.recursive-language-models]
+enable = true
+autoload = true
+
+[icedos.ai-tools.pi-agent.extensions.vpn-rotate]
+enable = true
+cooldownSeconds = 0
+maxPerHour = 60
+excludedCountries = ["CN"]
+
+[icedos.ai-tools.pi-agent.settings.providers.opencode-free.modelOverrides.big-pickle]
+contextWindow = 200000
+
+[icedos.ai-tools.pi-agent.settings.extra]
+defaultThinkingLevel = "high"
+
+[icedos.ai-tools.pi-agent.skills]
+codeReview = true
+
+[icedos.ai-tools.pi-agent.skills.extra-builtin]
+free-review = '''
+---
+name: free-review
+description: Review your changes with the code-review skill in a review-until-clean loop, using only free models as children, the local llamacpp model first and then opencode-free. Use when the user asks for a free review or asks to review until no findings remain.
+---
+
+# Free review
+
+Read the code-review skill, then review your changes with it in its review-until-clean loop, following these rules:
+
+1. Use only the free models listed below as children, and no other provider or model.
+2. Pick models in the provider order below. Move to the next provider only when every model of the earlier ones is failing or the GPU check fails, and only for the rest of that round.
+3. The review is complete when a round has no findings.
+4. Run the code-review steps yourself, with no orchestrator child, and start every reviewer and verify child with `child()` below instead of `rlm()`. `rlm()` always runs the child on your own model, so it cannot pick a model per child.
+
+## Models and children
+
+List the models from the shell. Pass each one as `<provider>/<model id>`, exactly as listed:
+
+```python
+import json, os, pathlib, subprocess
+
+def free_models():
+    out = subprocess.run(["pi", "--list-models"], capture_output=True, text=True).stdout
+    rows = [line.split() for line in out.splitlines()]
+    return [f"{r[0]}/{r[1]}" for r in rows if len(r) > 1 and r[0] in ("llamacpp", "opencode-free")]
+
+agent_dir = pathlib.Path(os.environ.get("PI_CODING_AGENT_DIR", pathlib.Path.home() / ".config/pi-agent"))
+wanted = ("opencode-free.ts", "rate-limit-hook.ts", "llamacpp-lifecycle.ts")
+extensions = [e for e in json.loads((agent_dir / "settings.json").read_text())["extensions"] if e.endswith(wanted)]
+
+def child(model, prompt, timeout=1800):
+    """Returns True when the child exited cleanly. Check its output file as well."""
+    args = ["pi", "-p", "--no-session", "--no-extensions", "--model", model]
+    for e in extensions:
+        args += ["-e", e]
+    try:
+        # Without a closed stdin, pi -p waits on it forever.
+        return subprocess.run(args + [prompt], stdin=subprocess.DEVNULL, capture_output=True, text=True, timeout=timeout).returncode == 0
+    except subprocess.TimeoutExpired:
+        return False
+```
+
+`child()` loads only the extensions that provide these models and their retries, so a child spends no requests on session titles or prompt suggestions.
+
+## Provider order
+
+1. opencode-free, every listed model. Up to four of these children may run at once. It comes last because the vpn-rotate extension rotates the VPN and retries on every opencode-free rate limit, so an opencode-free model rarely fails over to another provider.
+
+## GPU check
+
+Run this right before every llamacpp child. The card number changes between boots and machines, so never hardcode it:
+
+```bash
+for d in /sys/class/drm/card[0-9]*/device; do [ -r $d/gpu_busy_percent ] && echo "$d busy=$(cat $d/gpu_busy_percent) used=$(cat $d/mem_info_vram_used) total=$(cat $d/mem_info_vram_total)"; done; pgrep -x llama-server
+```
+
+Judge the card with the largest VRAM total. If none is listed, use `nvidia-smi --query-gpu=utilization.gpu,memory.used,memory.total --format=csv`.
+
+The GPU is in use if busy is above 30%, or if `llama-server` is not running and VRAM used is above 4 GiB (4294967296 bytes). If it is in use, do not start or call the local model. Use opencode-free for that child and tell the user why.
+
+## When a child fails
+
+A child failed when `child()` returns False or its output file is missing or is not valid JSON.
+
+- Mark that model as failing for the rest of the review and run the same task on another free model. Do not retry the failed model, and do not end the round with a task that no child finished.
+- If every model is failing, stop and report which tasks did not finish. Do not report the change as clean.
+- Before you report a round as clean, confirm every reviewer child in it produced its output file. A round with a failed reviewer is not a clean round.
+'''
