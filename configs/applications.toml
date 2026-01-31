@@ -1,0 +1,23 @@
+[[icedos.repositories]]
+url = "github:icedos/apps"
+# overrideUrl = "path:/home/ice/.code/icedos/apps"
+fetchOptionalDependencies = true
+modules = [
+  "btop",
+  "celluloid",
+  "helium",
+  "lact",
+  "nautilus",
+  "ncdu",
+  "opencode",
+  "prime-agent",
+  "tailscale",
+  "walker",
+  "zed",
+]
+
+[icedos.applications.btop]
+diskExclusions = ["/boot", "/home"]
+
+[icedos.applications.kitty]
+hideDecorations = true

@@ -1,0 +1,21 @@
+[icedos.users.ice]
+description = "IceDBorn"
+
+[icedos.system]
+packages = [
+  "anydesk",
+  "beekeeper-studio",
+  "proton-vpn-cli",
+  "teamviewer",
+]
+version = "25.11"
+
+[icedos.system.bootloaders.systemd-boot]
+mountPoint = "/boot"
+
+[icedos.system.git.users.ice]
+username = "IceDBorn"
+email = "git.outsider841@simplelogin.fr"
+
+[icedos.system.toolset]
+desktopEntries = true

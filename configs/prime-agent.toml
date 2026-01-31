@@ -1,0 +1,9 @@
+[icedos.applications.prime-agent]
+defaultProvider = "opencode"
+defaultModel = "big-pickle"
+
+[icedos.applications.prime-agent.providers.opencode.modelOverrides.big-pickle]
+contextWindow = 100000
+
+[icedos.applications.prime-agent.providers.opencode-go.modelOverrides.deepseek-v4-pro]
+contextWindow = 500000
