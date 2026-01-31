@@ -1,0 +1,19 @@
+[[icedos.system.overlays.fromChannel]]
+url = "github:nixos/nixpkgs/master"
+packages = []
+
+[[icedos.system.overlays.fromChannel]]
+url = "github:nixos/nixpkgs/nixos-25.11"
+packages = []
+
+[[icedos.system.overlays.fromChannel]]
+url = "github:nixos/nixpkgs/nixos-unstable-small"
+packages = []
+
+[[icedos.system.overlays.fromChannel]]
+url = "github:nixos/nixpkgs/nixpkgs-unstable"
+packages = []
+
+[[icedos.system.overlays.fromChannel]]
+url = "github:nixos/nixpkgs/staging-next"
+packages = []
