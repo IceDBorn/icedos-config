@@ -1,0 +1,16 @@
+[[icedos.repositories]]
+url = "github:icedos/hardware"
+# overrideUrl = "path:/home/ice/.code/icedos/hardware"
+modules = [
+  "cachyos-kernel",
+  "disable-ipv6",
+  "kernel",
+  "radeon",
+  "ryzen",
+]
+
+[icedos.hardware.kernel]
+variant = "latest"
+
+[icedos.hardware.network]
+firewall = false
