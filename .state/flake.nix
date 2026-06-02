@@ -9,7 +9,7 @@
       url = "github:nix-community/home-manager";
     };
     icedos-config = {
-      url = "path:/nix/store/xas7ydcx4q5k8psycznr6198c41rxb75-icedos-config";
+      url = "path:/nix/store/27grzgf2rbxhw2dh8h7g0c115z8x1wi4-icedos-config";
     };
     icedos-config-_light-sync-ambiled = {
       inputs = {
@@ -23,7 +23,7 @@
       follows = "icedos-config/icedos";
     };
     icedos-github_icedborn_claude-icedos = {
-      url = "github:icedborn/claude-icedos/03643b9b8fe34fbe7b66a112393137a73def6d99";
+      url = "github:icedborn/claude-icedos/3872b8136f5c33748b9cc7fa8d6ef2a82a6bab75";
     };
     icedos-github_icedborn_claude-icedos-peon-ping-peon-ping = {
       inputs = {
@@ -34,7 +34,7 @@
       url = "github:PeonPing/peon-ping";
     };
     icedos-github_icedos_apps = {
-      url = "github:icedos/apps/7f1238cf5f669182a8c3bbd4f79431e5a2453e6e";
+      url = "github:icedos/apps/c390dc21b80848e14c9bb96e246501d5fd823870";
     };
     icedos-github_icedos_apps-celluloid-celluloid-shader = {
       flake = false;
@@ -56,22 +56,8 @@
       };
       url = "github:HikariKnight/ScopeBuddy";
     };
-    icedos-github_icedos_cosmic = {
-      url = "github:icedos/cosmic/36b50a0b8b9e357e92756aad9347515ea020613d";
-    };
-    icedos-github_icedos_cosmic-default-cosmic-manager = {
-      inputs = {
-        home-manager = {
-          follows = "home-manager";
-        };
-        nixpkgs = {
-          follows = "nixpkgs";
-        };
-      };
-      url = "github:HeitorAugustoLN/cosmic-manager";
-    };
     icedos-github_icedos_desktop = {
-      url = "github:icedos/desktop/5076f66219a4791254103154b69c0348603feb05";
+      url = "github:icedos/desktop/c1a64443b11b20e479317ad3e324a1df14a781d4";
     };
     icedos-github_icedos_desktop-stylix-stylix = {
       inputs = {
@@ -82,10 +68,24 @@
       url = "github:nix-community/stylix";
     };
     icedos-github_icedos_hardware = {
-      url = "github:icedos/hardware/e3a407391d2bc89290fa8a43393db37a8d71252d";
+      url = "github:icedos/hardware/4ea4e85b7df5d5b874cb2dbb34da228333a85cde";
     };
     icedos-github_icedos_hardware-cachyos-kernel-nix-cachyos-kernel = {
       url = "github:xddxdd/nix-cachyos-kernel/release";
+    };
+    icedos-github_icedos_kde = {
+      url = "github:icedos/kde/266a524801aafc5ba4cbeb4ef2c5c90421ba7e29";
+    };
+    icedos-github_icedos_kde-default-plasma-manager = {
+      inputs = {
+        home-manager = {
+          follows = "home-manager";
+        };
+        nixpkgs = {
+          follows = "nixpkgs";
+        };
+      };
+      url = "github:nix-community/plasma-manager";
     };
     icedos-github_icedos_providers = {
       url = "github:icedos/providers/c1a5aa2f9cdfd58f0c58ea78a4905c6afa9c373e";
@@ -93,9 +93,12 @@
     icedos-github_icedos_tweaks = {
       url = "github:icedos/tweaks/13a2a6c4a6bac229b5a980398c70c54783ff2845";
     };
+    icedos-overlay-github_nixos_nixpkgs_nixos-unstable-small = {
+      url = "github:nixos/nixpkgs/nixos-unstable-small";
+    };
     icedos-state = {
       flake = false;
-      url = "path:/nix/store/2l5hwvv76crrz2nsgaba1mrgiq5g6299-icedos";
+      url = "path:/nix/store/y4p5jjd5vynz5dfiwbd1ikam19gn9ipm-icedos";
     };
     nixpkgs = {
       url = "github:nixos/nixpkgs/nixos-unstable";
@@ -180,6 +183,23 @@
           }
 
           home-manager.nixosModules.home-manager
+
+          ({ config, lib, ... }: {
+            # `lib.mkBefore` keeps these overlays at the head of
+            # `nixpkgs.overlays` so they swap the package source
+            # *before* downstream patch overlays (e.g. cosmic
+            # patches) run via `prev.<pkg>.overrideAttrs`. Without
+            # it the swap clobbers patches that already landed on
+            # the base derivation.
+            nixpkgs.overlays = lib.mkBefore (
+              icedosLib.pkgs.overlaysFromChannel config.icedos
+                inputs."icedos-overlay-github_nixos_nixpkgs_nixos-unstable-small"
+                [
+                  "kdePackages"
+                  "sunshine"
+                ]
+            );
+          })
 
           { icedos.system.isFirstBuild = true; }
 

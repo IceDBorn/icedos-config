@@ -3,8 +3,10 @@ url = "github:icedos/apps"
 # overrideUrl = "path:/home/ice/Projects/icedos/apps"
 fetchOptionalDependencies = true
 modules = [
+  "bb-launcher",
   "btop",
   "celluloid",
+  "eden",
   "gamescope",
   "helium",
   "lact",
@@ -14,9 +16,8 @@ modules = [
   "me3",
   "nautilus",
   "ncdu",
-  "network-manager",
+  "nx-optimizer",
   "obs",
-  "polaris",
   "power-profiles-daemon",
   "prefixer",
   "proton-launch",
@@ -26,20 +27,27 @@ modules = [
   "scx",
   "sd-inhibitor",
   "sekirofpsunlock",
-  "simpmusic",
-  "steam",
-  "sunshine",
+  "spotube",
+  "steam-sunshine-headless-session",
   "tailscale",
   "unshade",
+  "walker",
   "zed",
   "zenergy",
 ]
 
 [[icedos.repositories]]
-url = "github:icedos/cosmic"
-# overrideUrl = "path:/home/ice/Projects/icedos/cosmic"
-modules = ["brightness-control"]
+url = "github:icedos/kde"
+# overrideUrl = "path:/home/ice/Projects/icedos/kde"
 fetchOptionalDependencies = true
+modules = [
+  "dynamic-workspaces",
+  "krohnkite",
+  "layout-osd",
+  "move-to-desktop-follow",
+  "no-titlebar",
+  "window-borders",
+]
 
 [[icedos.repositories]]
 url = "github:icedos/desktop"
@@ -117,6 +125,19 @@ fpsLimit = "0,144,60,30"
 
 [icedos.applications.kitty]
 hideDecorations = true
+
+[icedos.applications.me3.games.ds3]
+profileVersion = "v1"
+disable_arxan = true
+start_online = false
+natives = [
+  { name = "seamless-coop", path = "/mnt/games-ssd/games/ds3/natives/ds3sc.dll", load_early = true },
+  { name = "proper-pc-experience", path = "/mnt/games-ssd/games/ds3/natives/d3d11.dll" },
+]
+
+[[icedos.applications.me3.games.ds3.profiles]]
+name = "ds3"
+natives = ["proper-pc-experience", "seamless-coop"]
 
 [icedos.applications.me3.games.eldenring]
 profileVersion = "v1"
@@ -230,11 +251,11 @@ name = "nr-variations"
 dependencies = ["nr-storm-control"]
 packages = ["variations"]
 
-[icedos.applications.network-manager]
-applet = true
-
-[icedos.applications.polaris]
+[icedos.applications.sunshine]
 autoStart = true
+
+[icedos.applications.sunshine.settings]
+sunshine_name = "Saloni City"
 
 [icedos.applications.power-profiles-daemon]
 profile = "performance"
@@ -255,17 +276,21 @@ readOnly = true
 [icedos.applications.scx]
 extraArgs = ["--performance"]
 
-[icedos.applications.sd-inhibitor.users.ice.watchers.pipewire]
-inputsToIgnore = ["Noise Canceling source", "Peak detect", "cava"]
-outputsToIgnore = ["Discord", "Element"]
-
 [icedos.applications.sd-inhibitor.users.ice.watchers.ports]
 inboundPorts = [22, 48100, 48200]
+
+[icedos.applications.spotube]
+nightly = true
+nightlyHash = "sha256-+DDDEkPNCVuUjj0UuzOFRDgVNcm1HQPFo2iSWkf/uN0="
 
 [icedos.applications.steam]
 beta = true
 cpuUsageWorkaround = true
 downloadsWorkaround = true
+
+[icedos.applications.steam.headlessSession]
+excludeHostControllers = false
+output = "HDMI-A-1"
 
 [icedos.applications.toolset]
 desktopEntries = true
@@ -284,6 +309,7 @@ reorderKeys = false
 autologinUser = "ice"
 defaultBrowser = "helium.desktop"
 defaultEditor = "dev.zed.Zed.desktop"
+keyboardLayouts = ["us", "gr"]
 wallpaper = "/home/ice/Pictures/wallpaper.jpg"
 
 [icedos.desktop.bookmarks]
@@ -304,126 +330,82 @@ disabledTargets = ["console", "kmscon"]
 maximizeButton = false
 minimizeButton = false
 
-[icedos.desktop.cosmic]
-disableExcludedPackagesWarning = true
-excludeDefaultPackages = [
-  "cosmic-applibrary",
-  "cosmic-files",
-  "cosmic-initial-setup",
-  "cosmic-launcher",
-]
-
-[[icedos.desktop.cosmic.brightnessControl.schedules]]
-at = "09:00"
-brightness = 100
-
-[[icedos.desktop.cosmic.brightnessControl.schedules]]
-at = "21:00"
-brightness = 75
-
-[icedos.desktop.cosmic.panel.plugins]
-right = [
-  "com.system76.CosmicAppletStatusArea",
-  "com.system76.CosmicAppletInputSources",
-  "com.system76.CosmicAppletBluetooth",
-  "com.system76.CosmicAppletAudio",
-  "com.system76.CosmicAppletNetwork",
-  "com.system76.CosmicAppletNotifications",
-  "com.system76.CosmicAppletTime",
-  "com.system76.CosmicAppletPower",
-]
-
-[icedos.desktop.cosmic.input.mouse]
-mouseSpeed = 65
-
-[[icedos.desktop.cosmic.input.keyboard.shortcuts]]
-action = "Close"
-keys = ["Super+semicolon"]
-
-[[icedos.desktop.cosmic.input.keyboard.shortcuts]]
-action = "Maximize"
-keys = ["Super+Greek_mu"]
-
-[[icedos.desktop.cosmic.input.keyboard.shortcuts]]
-action = "ToggleWindowFloating"
-keys = ["Super+g", "Super+Greek_gamma"]
-
-[[icedos.desktop.cosmic.input.keyboard.shortcuts]]
-action = "WorkspaceOverview"
-keys = ["Super+Greek_finalsmallsigma"]
-variant = "System"
-
-[[icedos.desktop.cosmic.input.keyboard.shortcuts]]
-command = "cosmic-screenshot"
-description = "Screenshot"
-keys = ["Super+p", "Super+Greek_pi"]
-variant = "Spawn"
-
-[[icedos.desktop.cosmic.input.keyboard.shortcuts]]
-command = "walker-applications"
-description = "Application launcher"
-keys = ["Super+r", "Super+Greek_rho"]
-variant = "Spawn"
-
-[[icedos.desktop.cosmic.input.keyboard.shortcuts]]
-command = "walker-clipboard"
-description = "Clipboard manager"
-keys = ["Super+v", "Super+Greek_omega"]
-variant = "Spawn"
-
-[[icedos.desktop.cosmic.input.keyboard.shortcuts]]
-command = "walker-emojis"
-description = "Emoji picker"
-keys = ["Super+e", "Super+Greek_epsilon"]
-variant = "Spawn"
-
-[[icedos.desktop.cosmic.input.keyboard.shortcuts]]
-command = "killall -9 .cosmic-panel-wrapped .walker-wrapped"
-description = "Soft Reset"
-keys = ["Ctrl+Alt+Delete"]
-variant = "Spawn"
-
-[icedos.desktop.cosmic.patches.cosmic-applets]
-boldPanelText = true
-centerPanelText = true
-stableClockWidth = true
-steamGameIconMatcher = true
-
-[icedos.desktop.cosmic.patches.cosmic-comp]
-dmemForegroundBooster = true
-fixTilingHintClipping = true
-perWindowKeyboardLayout = true
-
-[icedos.desktop.cosmic.patches.cosmic-osd]
-keyboardLayoutOsd = true
-osdTimeoutMs = 750
-
-[icedos.desktop.cosmic.patches.cosmic-notifications]
-windowMatchingRoundness = true
-
-[icedos.desktop.cosmic.patches.xdg-desktop-portal-cosmic]
-useGtkFilePicker = true
-
-[icedos.desktop.cosmic.power.lock]
-disableMonitorsOnLockKeybind = true
-
-[icedos.desktop.cosmic.windowManagement.focus]
-cursorFollowsFocus = true
-followsCursor = true
-
-[icedos.desktop.cosmic.workspaces]
-tile = true
-
-[icedos.desktop.cosmic.users.ice]
+[icedos.desktop.windows.focus]
+followsMouse = true
+delay = 0
 
 [icedos.desktop.users.ice]
-startupScript = """
-  sleep 1 &&
-  signal-desktop &
-"""
+startupScript = "signal-desktop"
+
+[icedos.desktop.xdgDesktopPortal]
+forceGtkFilePicker = true
+
+[icedos.desktop.kde]
+excludeDefaultPackages = [
+  "aurorae",
+  "baloo-widgets",
+  "dolphin",
+  "dolphin-plugins",
+  "plasma-browser-integration",
+  "plasma-workspace-wallpapers",
+]
+
+[icedos.desktop.kde.keyboard]
+switchingPolicy = "window"
+
+[icedos.desktop.kde.panel]
+height = 32
+location = "top" # top, bottom, left, right, floating
+widgets = [
+  "org.kde.plasma.pager",
+  "org.kde.plasma.panelspacer",
+  "org.kde.plasma.icontasks",
+  "org.kde.plasma.panelspacer",
+  "org.kde.plasma.marginsseparator",
+  "org.kde.plasma.systemtray",
+  "org.kde.plasma.digitalclock",
+  "org.kde.plasma.lock_logout",
+]
+
+[icedos.desktop.kde.panel.systemTray]
+disabledApplets = [
+  "org.kde.plasma.clipboard",
+  "org.kde.plasma.weather",
+]
+
+[[icedos.desktop.kde.screenEdges]]
+position = "topLeft"
+action = "none"
+
+[icedos.desktop.kde.shortcuts.bindings."KDE Keyboard Layout Switcher"]
+"Switch to Next Keyboard Layout" = "Meta+Space"
+
+[icedos.desktop.kde.shortcuts.bindings."services/org.kde.spectacle.desktop"]
+_launch = [ "Meta+P", "Meta+Π"]
+
+[icedos.desktop.kde.shortcuts.hotkeys.walker-applications]
+name = "Walker"
+command = "walker -m desktopapplications"
+keys = ["Meta+R", "Meta+Ρ"]
+logs.enabled = false
+
+[icedos.desktop.kde.shortcuts.hotkeys.walker-clipboard]
+name = "Walker Clipboard"
+command = "walker -m clipboard"
+keys = [ "Meta+V", "Meta+Ω" ]
+logs.enabled = false
+
+[icedos.desktop.kde.shortcuts.hotkeys.walker-emojis]
+name = "Walker Emojis"
+command = "walker -m symbols"
+keys = [ "Meta+E", "Meta+Ε" ]
+logs.enabled = false
 
 [icedos.hardware]
 swapDevices = ["/swap/swapfile"]
+
+[icedos.hardware.bluetooth]
+controllerMode = "dual"
 
 [icedos.hardware.bootloaders.systemd-boot]
 mountPoint = "/boot"
@@ -464,6 +446,9 @@ firewall = false
 [icedos.hardware.network.wakeOnLan]
 interfaces = ["enp9s0"]
 
+[icedos.hardware.pipewire.echoCancellation]
+enable = true
+
 [icedos.hardware.pipewire.noiseCancellation]
 enable = true
 
@@ -477,6 +462,8 @@ description = "IceDBorn"
 [icedos.system]
 packages = [
   "faugus-launcher",
+  "shadps4",
+  "shadps4-qtlauncher",
   "signal-desktop",
 ]
 version = "25.11"
@@ -495,7 +482,7 @@ packages = []
 
 [[icedos.system.overlays.fromChannel]]
 url = "github:nixos/nixpkgs/nixos-unstable-small"
-packages = []
+packages = ["kdePackages", "sunshine"]
 
 [[icedos.system.overlays.fromChannel]]
 url = "github:nixos/nixpkgs/nixpkgs-unstable"
