@@ -9,7 +9,7 @@
       url = "github:nix-community/home-manager";
     };
     icedos-config = {
-      url = "path:/nix/store/27grzgf2rbxhw2dh8h7g0c115z8x1wi4-icedos-config";
+      url = "path:/nix/store/rp2b76ig6cylna63ap5qinvjwygfxw85-icedos-config";
     };
     icedos-config-_light-sync-ambiled = {
       inputs = {
@@ -23,7 +23,7 @@
       follows = "icedos-config/icedos";
     };
     icedos-github_icedborn_claude-icedos = {
-      url = "github:icedborn/claude-icedos/3872b8136f5c33748b9cc7fa8d6ef2a82a6bab75";
+      url = "github:icedborn/claude-icedos/03df97892a9e306a079053f008206d60a72687a0";
     };
     icedos-github_icedborn_claude-icedos-peon-ping-peon-ping = {
       inputs = {
@@ -34,7 +34,7 @@
       url = "github:PeonPing/peon-ping";
     };
     icedos-github_icedos_apps = {
-      url = "github:icedos/apps/c390dc21b80848e14c9bb96e246501d5fd823870";
+      url = "github:icedos/apps/e8ff1064b60f7aac73622cdf7ab7fb9ffcc96e2d";
     };
     icedos-github_icedos_apps-celluloid-celluloid-shader = {
       flake = false;
@@ -57,7 +57,7 @@
       url = "github:HikariKnight/ScopeBuddy";
     };
     icedos-github_icedos_desktop = {
-      url = "github:icedos/desktop/c1a64443b11b20e479317ad3e324a1df14a781d4";
+      url = "github:icedos/desktop/96f1cc84cae9029a11bc64de0af1e69e47976e12";
     };
     icedos-github_icedos_desktop-stylix-stylix = {
       inputs = {
@@ -68,13 +68,13 @@
       url = "github:nix-community/stylix";
     };
     icedos-github_icedos_hardware = {
-      url = "github:icedos/hardware/4ea4e85b7df5d5b874cb2dbb34da228333a85cde";
+      url = "github:icedos/hardware/f37393375413b597f4b5fe5a7435b7b6c51889f9";
     };
     icedos-github_icedos_hardware-cachyos-kernel-nix-cachyos-kernel = {
       url = "github:xddxdd/nix-cachyos-kernel/release";
     };
     icedos-github_icedos_kde = {
-      url = "github:icedos/kde/266a524801aafc5ba4cbeb4ef2c5c90421ba7e29";
+      url = "github:icedos/kde/bcbb881c960af0f734ceaca3a103d097d62a08fa";
     };
     icedos-github_icedos_kde-default-plasma-manager = {
       inputs = {
@@ -88,17 +88,14 @@
       url = "github:nix-community/plasma-manager";
     };
     icedos-github_icedos_providers = {
-      url = "github:icedos/providers/c1a5aa2f9cdfd58f0c58ea78a4905c6afa9c373e";
+      url = "github:icedos/providers/31ce3075807383c9648409d8fb8641982f3eb2e3";
     };
     icedos-github_icedos_tweaks = {
-      url = "github:icedos/tweaks/13a2a6c4a6bac229b5a980398c70c54783ff2845";
-    };
-    icedos-overlay-github_nixos_nixpkgs_nixos-unstable-small = {
-      url = "github:nixos/nixpkgs/nixos-unstable-small";
+      url = "github:icedos/tweaks/7bda8d9f35790be26ff073bcb2ba6f7d1a1af825";
     };
     icedos-state = {
       flake = false;
-      url = "path:/nix/store/y4p5jjd5vynz5dfiwbd1ikam19gn9ipm-icedos";
+      url = "path:/nix/store/b5pb0sszvr7r728vsgc1zyn6xz0sy0ln-icedos";
     };
     nixpkgs = {
       url = "github:nixos/nixpkgs/nixos-unstable";
@@ -133,7 +130,8 @@
 
       inherit (pkgs) lib;
       inherit (builtins) pathExists;
-      inherit (import "${inputs.icedos-core}/lib/load-user-config.nix" "${inputs.icedos-config}") icedos;
+      userConfig = import "${inputs.icedos-core}/lib/load-user-config.nix" "${inputs.icedos-config}";
+      inherit (userConfig) icedos;
 
       icedosLib = import "${inputs.icedos-core}/lib" {
         inherit lib pkgs inputs;
@@ -182,24 +180,16 @@
             config.system.stateVersion = "25.11";
           }
 
-          home-manager.nixosModules.home-manager
-
-          ({ config, lib, ... }: {
-            # `lib.mkBefore` keeps these overlays at the head of
-            # `nixpkgs.overlays` so they swap the package source
-            # *before* downstream patch overlays (e.g. cosmic
-            # patches) run via `prev.<pkg>.overrideAttrs`. Without
-            # it the swap clobbers patches that already landed on
-            # the base derivation.
-            nixpkgs.overlays = lib.mkBefore (
-              icedosLib.pkgs.overlaysFromChannel config.icedos
-                inputs."icedos-overlay-github_nixos_nixpkgs_nixos-unstable-small"
-                [
-                  "kdePackages"
-                  "sunshine"
-                ]
-            );
+          # Raw NixOS config passthrough: every top-level table in
+          # config.toml / .private.toml *except* [icedos.*] is applied verbatim
+          # as NixOS config. nixpkgs' module system types & validates each option —
+          # IceDOS declares no schema. (home-manager is reachable the usual way,
+          # under [home-manager.users.<name>.*].)
+          (lib.setDefaultModuleLocation "config.toml / .private.toml (raw NixOS passthrough)" {
+            config = builtins.removeAttrs userConfig [ "icedos" ];
           })
+
+          home-manager.nixosModules.home-manager
 
           { icedos.system.isFirstBuild = true; }
 

@@ -33,7 +33,6 @@ modules = [
   "unshade",
   "walker",
   "zed",
-  "zenergy",
 ]
 
 [[icedos.repositories]]
@@ -70,6 +69,7 @@ modules = [
   "upower",
   "wake-on-lan",
   "xpadneo",
+  "zenergy",
 ]
 
 [[icedos.repositories]]
@@ -126,30 +126,17 @@ fpsLimit = "0,144,60,30"
 [icedos.applications.kitty]
 hideDecorations = true
 
-[icedos.applications.me3.games.ds3]
-profileVersion = "v1"
-disable_arxan = true
-start_online = false
-natives = [
-  { name = "seamless-coop", path = "/mnt/games-ssd/games/ds3/natives/ds3sc.dll", load_early = true },
-  { name = "proper-pc-experience", path = "/mnt/games-ssd/games/ds3/natives/d3d11.dll" },
-]
-
-[[icedos.applications.me3.games.ds3.profiles]]
-name = "ds3"
-natives = ["proper-pc-experience", "seamless-coop"]
-
 [icedos.applications.me3.games.eldenring]
 profileVersion = "v1"
 disable_arxan = true
 start_online = true
 natives = [
-  { name = "convergence-alt-saves", path = "/mnt/games-ssd/games/er/natives/convergence/eldenring_alt_saves.dll" },
-  { name = "convergence-cmi", path = "/mnt/games-ssd/games/er/natives/convergence/CMI.dll" },
-  { name = "convergence-erdtools", path = "/mnt/games-ssd/games/er/natives/convergence/ErdTools.dll" },
-  { name = "convergence-erdyes", path = "/mnt/games-ssd/games/er/natives/convergence/erdyes.dll" },
-  { name = "convergence-scripts-exposer", path = "/mnt/games-ssd/games/er/natives/convergence/Scripts-Data-Exposer-FS.dll" },
-  { name = "convergence-transmogrify", path = "/mnt/games-ssd/games/er/natives/convergence/ertransmogrify.dll" },
+  { name = "convergence-alt-saves", path = "/mnt/games-ssd/games/er/packages/convergence/dll/eldenring_alt_saves.dll" },
+  { name = "convergence-erdtools", path = "/mnt/games-ssd/games/er/packages/convergence/dll/ErdTools.dll" },
+  { name = "convergence-erdyes", path = "/mnt/games-ssd/games/er/packages/convergence/dll/erdyes.dll" },
+  { name = "convergence-scripts-exposer", path = "/mnt/games-ssd/games/er/packages/convergence/dll/Scripts-Data-Exposer-FS.dll" },
+  { name = "convergence-transmogrify", path = "/mnt/games-ssd/games/er/packages/convergence/dll/ertransmogrify.dll" },
+  { name = "convergence-unlock-wwise-states", path = "/mnt/games-ssd/games/er/packages/convergence/dll/unlock_wwise_states_er.dll" },
   { name = "disable-sharpening", path = "/mnt/games-ssd/games/er/natives/disable-sharpening.dll" },
   { name = "increase-animation-distance", path = "/mnt/games-ssd/games/er/natives/increase-animation-distance.dll" },
   { name = "no-fall-damage", path = "/mnt/games-ssd/games/er/natives/no-fall-damage.dll" },
@@ -161,7 +148,7 @@ natives = [
   { name = "unlock-fps", path = "/mnt/games-ssd/games/er/natives/unlock-fps.dll" },
 ]
 packages = [
-  { id = "convergence", path = "/mnt/games-ssd/games/er/packages/convergence" },
+  { id = "convergence", path = "/mnt/games-ssd/games/er/packages/convergence/mod" },
   { id = "fast-torrent", path = "/mnt/games-ssd/games/er/packages/fast-torrent" },
   { id = "nightreign-movement-speed", path = "/mnt/games-ssd/games/er/packages/nightreign-movement-speed" },
 ]
@@ -194,12 +181,11 @@ packages = [
 name = "er-convergence"
 dependencies = ["er"]
 natives = [
-  "convergence-alt-saves",
-  "convergence-cmi",
   "convergence-erdtools",
   "convergence-erdyes",
   "convergence-scripts-exposer",
   "convergence-transmogrify",
+  "convergence-unlock-wwise-states",
 ]
 packages = [
   "convergence",
@@ -292,7 +278,7 @@ downloadsWorkaround = true
 excludeHostControllers = false
 output = "HDMI-A-1"
 
-[icedos.applications.toolset]
+[icedos.system.toolset]
 desktopEntries = true
 
 [icedos.applications.unshade]
@@ -482,7 +468,7 @@ packages = []
 
 [[icedos.system.overlays.fromChannel]]
 url = "github:nixos/nixpkgs/nixos-unstable-small"
-packages = ["kdePackages", "sunshine"]
+packages = []
 
 [[icedos.system.overlays.fromChannel]]
 url = "github:nixos/nixpkgs/nixpkgs-unstable"
