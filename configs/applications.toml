@@ -1,0 +1,82 @@
+[[icedos.repositories]]
+url = "github:icedos/apps"
+# overrideUrl = "path:/home/ice/Projects/icedos/apps"
+fetchOptionalDependencies = true
+modules = [
+  "bb-launcher",
+  "btop",
+  "celluloid",
+  "eden",
+  "gamescope",
+  "helium",
+  "lact",
+  "mangohud",
+  "me3",
+  "nautilus",
+  "ncdu",
+  "nx-optimizer",
+  "obs",
+  "opencode",
+  "peon-ping",
+  "prefixer",
+  "proton-launch",
+  "protonvpn-cli",
+  "reigntweak",
+  "sd-inhibitor",
+  "sekirofpsunlock",
+  "shadps4",
+  "steam-sunshine-headless-session",
+  "tailscale",
+  "unshade",
+  "walker",
+  "zed",
+]
+
+[icedos.applications.btop]
+diskExclusions = ["/boot", "/home"]
+
+[icedos.applications.mangohud]
+fpsLimit = "0,144,60,30"
+
+[icedos.applications.kitty]
+hideDecorations = true
+
+[icedos.applications.peon-ping.users.ice]
+defaultPack = "ds1-siegmeyer"
+
+[[icedos.applications.peon-ping.users.ice.customPacks]]
+name = "ds1-siegmeyer"
+owner = "jmfiebak"
+repo = "openpeon-siegmeyer-sound-pack"
+rev = "v1.0.1"
+hash = "sha256-C6oJnFva6Ln360s2PqrlNu5LMi64QMObys573glMXxM="
+
+[icedos.applications.protonvpn-cli.connect]
+country = "BG"
+
+[icedos.applications.protonvpn-cli.desktopEntry]
+countries = ["BG", "GR", "RO"]
+
+[icedos.applications.sd-inhibitor.users.ice.watchers.ports]
+inboundPorts = [22, 48100, 48200]
+
+[icedos.applications.shadps4]
+prerelease = true
+
+[icedos.applications.steam]
+beta = true
+cpuUsageWorkaround = true
+downloadsWorkaround = true
+
+[icedos.system.toolset]
+desktopEntries = true
+
+[icedos.applications.unshade]
+includeInIcedosGc = true
+
+[icedos.applications.zed]
+vim = true
+
+[icedos.applications.zed.lsp.taplo.settings.formatter]
+alignComments = false
+reorderKeys = false

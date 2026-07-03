@@ -1,3 +1,11 @@
+# Generated state (flake + caches); keep only the lock.
 .state/*
 !.state/flake.lock
-.private.toml
+
+# Local-only, hidden extras: dot-prefixed configs/modules are still loaded by
+# IceDOS but never committed. Hidden config files (configs/.<name>.toml — the
+# successor to .private.toml) and hidden loose modules (modules/.<name>.nix):
+.*.nix
+.*.toml
+# Hidden folder-modules (modules/.<name>/ holding default.nix / icedos.nix):
+modules/.*/

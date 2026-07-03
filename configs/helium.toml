@@ -1,0 +1,30 @@
+[[icedos.applications.helium.profiles]]
+exec = "helium-discord"
+name = "Discord"
+sites = [
+  "https://discord.com/app",
+]
+
+[[icedos.applications.helium.profiles]]
+exec = "helium-element"
+name = "Element"
+sites = [
+  "https://develop.element.io",
+]
+
+[[icedos.applications.helium.profiles]]
+exec = "helium-proton"
+name = "Proton"
+sites = [
+  "https://drive.proton.me",
+  "https://lumo.proton.me",
+  "https://mail.proton.me",
+  "https://pass.proton.me",
+]
+
+[[icedos.applications.helium.profiles]]
+exec = "helium-sharkord"
+name = "Sharkord"
+sites = [
+  "https://sharkord.knp.one",
+]

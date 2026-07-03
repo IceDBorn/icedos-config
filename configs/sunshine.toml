@@ -1,0 +1,14 @@
+[icedos.applications.sunshine]
+autoStart = true
+
+[icedos.applications.sunshine.settings]
+sunshine_name = "Saloni City"
+
+[icedos.applications.steam.headlessSession]
+colorManagement = true
+excludeHostControllers = false
+hdr = true
+steamOS = true
+
+[icedos.applications.steam.headlessSession.desktopCapture]
+enable = true

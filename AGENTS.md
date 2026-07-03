@@ -19,19 +19,25 @@ loop and where the local-checkout override toggles live.
 
 ## Layout
 - `config.toml` — the system description (enabled repos/modules + every `icedos.*`
-  option). The main file you edit.
-- `.private.toml` — secrets/personal values, strict-merged with `config.toml` (a key in
-  both = error).
+  option). The main file you edit. **Optional** — a root can be defined entirely by
+  `configs/*.toml` and/or `modules/`; the root is marked by `flake.nix`, not `config.toml`.
+- `configs/*.toml` — autoloaded and strict-merged onto `config.toml` (a scalar key in two
+  files = error). Split config by concern. A hidden `configs/.<name>.toml` (dot-prefixed)
+  loads the same but is gitignored — secrets/per-host values that stay off git (replaces
+  the old `.private.toml`). Dirs scanned = `icedos.system.extraConfigs` (default
+  `["configs"]`); add more paths to load from several folders. A file opts out of loading
+  with a top-level `enable = false` (default true).
 - `flake.nix` — calls `icedos.lib.mkIceDOS { configRoot = self; }`. Has a commentable
   `path:` pin for testing a **local core** checkout.
-- `extra-modules/` — advanced custom Nix/IceDOS modules for this machine. Eval errors
-  from one name their source: `config#<name>` for an `icedos.nix` extra-module, or the
-  on-disk path for a plain `default.nix`.
+- `modules/` — advanced custom Nix/IceDOS modules for this machine. Eval errors from one
+  name their source: `config#<name>` for an `icedos.nix` module, or the on-disk path for a
+  plain `default.nix`. A hidden `modules/.<name>/` (or `modules/.<name>.nix`) is gitignored
+  but still loaded. Dirs scanned = `icedos.system.extraModules` (default `["modules"]`).
 - `.state/` — generated flake/lock + `.cache/`. **Do not hand-edit.**
 
 ## Raw NixOS options from TOML
 
-Any top-level table that **isn't** `icedos` (in `config.toml` or `.private.toml`) is
+Any top-level table that **isn't** `icedos` (in `config.toml` or a `configs/*.toml`) is
 applied as raw NixOS config — nixpkgs types/validates it, there is **no** IceDOS schema.
 Use it for plain options no IceDOS module exposes:
 
@@ -47,7 +53,7 @@ enable = true
 - Works for anything TOML can express: bools, ints, strings (incl. enum/path options),
   scalar lists (e.g. `[boot] kernelParams = ["quiet"]`).
 - **Can't** express packages (`pkgs.foo`), `null`, `mkForce`/`mkDefault`, or `lib.*` —
-  use `extra-modules/<name>/default.nix` for those.
+  use `modules/<name>/default.nix` for those.
 - Normal priority: setting an option an IceDOS module already sets = a clear nixpkgs
   conflict error (don't set the same thing twice).
 - A stray top-level table (e.g. forgetting the `icedos.` prefix) fails loud as an

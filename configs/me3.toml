@@ -1,0 +1,112 @@
+[icedos.applications.me3.games.eldenring]
+profileVersion = "v1"
+disable_arxan = true
+start_online = true
+natives = [
+  { name = "convergence-alt-saves", path = "/mnt/games-ssd/games/er/packages/convergence/dll/eldenring_alt_saves.dll" },
+  { name = "convergence-erdtools", path = "/mnt/games-ssd/games/er/packages/convergence/dll/ErdTools.dll" },
+  { name = "convergence-erdyes", path = "/mnt/games-ssd/games/er/packages/convergence/dll/erdyes.dll" },
+  { name = "convergence-scripts-exposer", path = "/mnt/games-ssd/games/er/packages/convergence/dll/Scripts-Data-Exposer-FS.dll" },
+  { name = "convergence-transmogrify", path = "/mnt/games-ssd/games/er/packages/convergence/dll/ertransmogrify.dll" },
+  { name = "convergence-unlock-wwise-states", path = "/mnt/games-ssd/games/er/packages/convergence/dll/unlock_wwise_states_er.dll" },
+  { name = "disable-sharpening", path = "/mnt/games-ssd/games/er/natives/disable-sharpening.dll" },
+  { name = "increase-animation-distance", path = "/mnt/games-ssd/games/er/natives/increase-animation-distance.dll" },
+  { name = "no-fall-damage", path = "/mnt/games-ssd/games/er/natives/no-fall-damage.dll" },
+  { name = "practice-tool", path = "/mnt/games-ssd/games/er/natives/er-practice-tool.dll" },
+  { name = "remove-chromatic-aberration", path = "/mnt/games-ssd/games/er/natives/remove-chromatic-aberration.dll" },
+  { name = "remove-vignette", path = "/mnt/games-ssd/games/er/natives/remove-vignette.dll" },
+  { name = "seamless-coop", path = "/mnt/games-ssd/games/er/natives/seamless-coop/ersc.dll" },
+  { name = "ultrawide", path = "/mnt/games-ssd/games/er/natives/ultrawide.dll" },
+  { name = "unlock-fps", path = "/mnt/games-ssd/games/er/natives/unlock-fps.dll" },
+]
+packages = [
+  { id = "convergence", path = "/mnt/games-ssd/games/er/packages/convergence/mod" },
+  { id = "fast-torrent", path = "/mnt/games-ssd/games/er/packages/fast-torrent" },
+  { id = "nightreign-movement-speed", path = "/mnt/games-ssd/games/er/packages/nightreign-movement-speed" },
+]
+
+[[icedos.applications.me3.games.eldenring.profiles]]
+name = "er"
+natives = [
+  "disable-sharpening",
+  "increase-animation-distance",
+  "remove-chromatic-aberration",
+  "remove-vignette",
+  "seamless-coop",
+  "ultrawide",
+  "unlock-fps",
+]
+
+[[icedos.applications.me3.games.eldenring.profiles]]
+name = "er-nr"
+dependencies = ["er"]
+natives = [
+  "no-fall-damage",
+  "practice-tool",
+]
+packages = [
+  "fast-torrent",
+  "nightreign-movement-speed",
+]
+
+[[icedos.applications.me3.games.eldenring.profiles]]
+name = "er-convergence"
+dependencies = ["er"]
+natives = [
+  "convergence-erdtools",
+  "convergence-erdyes",
+  "convergence-scripts-exposer",
+  "convergence-transmogrify",
+  "convergence-unlock-wwise-states",
+  "no-fall-damage",
+]
+packages = [
+  "convergence",
+]
+
+[icedos.applications.me3.games.nightreign]
+profileVersion = "v1"
+disable_arxan = true
+start_online = true
+natives = [
+  { name = "cl-server-redirector", path = "/mnt/games-ssd/games/nr/natives/cl_server_redirector.dll" },
+  { name = "disable-chromatic-aberration", path = "/mnt/games-ssd/games/nr/natives/disable-chromatic-aberration.dll" },
+  { name = "disable-sharpening", path = "/mnt/games-ssd/games/nr/natives/disable-sharpening.dll" },
+  { name = "disable-vignette", path = "/mnt/games-ssd/games/nr/natives/disable-vignette.dll" },
+  { name = "increase-animation-distance", path = "/mnt/games-ssd/games/nr/natives/increase-animation-distance.dll" },
+  { name = "seamless-coop", path = "/mnt/games-ssd/games/nr/natives/nrsc.dll", load_early = true },
+  { name = "storm-control", path = "/mnt/games-ssd/games/nr/natives/storm-control.dll", load_early = true },
+  { name = "ultrawide", path = "/mnt/games-ssd/games/nr/natives/ultrawide.dll" },
+  { name = "unlock-fps", path = "/mnt/games-ssd/games/nr/natives/unlock-fps.dll" },
+  { name = "vision-of-nightreign", path = "/mnt/games-ssd/games/nr/natives/vision-of-nightreign.dll" },
+]
+packages = [
+  { id = "blue-filter-removal", path = "/mnt/games-ssd/games/nr/packages/blue-filter-removal" },
+  { id = "variations", path = "/mnt/games-ssd/games/nr/packages/variations/output" },
+]
+
+[[icedos.applications.me3.games.nightreign.profiles]]
+name = "nr"
+natives = [
+  "cl-server-redirector",
+  "disable-chromatic-aberration",
+  "disable-sharpening",
+  "disable-vignette",
+  "increase-animation-distance",
+  # "seamless-coop",
+  "ultrawide",
+  "unlock-fps",
+]
+packages = [
+  "blue-filter-removal",
+]
+
+[[icedos.applications.me3.games.nightreign.profiles]]
+name = "nr-storm-control"
+dependencies = ["nr"]
+natives = ["storm-control"]
+
+[[icedos.applications.me3.games.nightreign.profiles]]
+name = "nr-variations"
+dependencies = ["nr-storm-control"]
+packages = ["variations"]

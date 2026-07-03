@@ -1,0 +1,38 @@
+[[icedos.repositories]]
+url = "github:icedos/desktop"
+# overrideUrl = "path:/home/ice/Projects/icedos/desktop"
+
+[icedos.desktop]
+autologinUser = "ice"
+defaultBrowser = "helium.desktop"
+defaultEditor = "dev.zed.Zed.desktop"
+keyboardLayouts = ["us", "gr"]
+wallpaper = "/home/ice/Pictures/wallpaper.jpg"
+
+[icedos.desktop.bookmarks]
+public = false
+templates = false
+
+[[icedos.desktop.entries]]
+id = "blanket"
+name = "Blanket"
+exec = "icedos pkgs run blanket"
+icon = "blanket"
+
+[icedos.desktop.stylix]
+enable = true
+disabledTargets = ["console", "kmscon"]
+
+[icedos.desktop.windows]
+maximizeButton = false
+minimizeButton = false
+
+[icedos.desktop.windows.focus]
+followsMouse = true
+delay = 0
+
+[icedos.desktop.users.ice]
+startupScript = "signal-desktop"
+
+[icedos.desktop.xdgDesktopPortal]
+forceGtkFilePicker = true

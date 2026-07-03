@@ -1,0 +1,23 @@
+[[icedos.hardware.mounts]]
+path = "/"
+device = "/dev/mapper/luks-8f9e6414-43d5-4056-a538-88f9d10a6d77"
+fsType = "xfs"
+flags = ["nofail", "x-gvfs-show"]
+
+[[icedos.hardware.mounts]]
+path = "/mnt/games-hdd"
+device = "/dev/disk/by-uuid/c56f7d1d-7def-4971-9e54-4e01561e71c2"
+fsType = "xfs"
+flags = ["nofail", "x-gvfs-show"]
+
+[[icedos.hardware.mounts]]
+path = "/mnt/games-ssd"
+device = "/dev/disk/by-uuid/3a5b4f50-c315-442e-902f-13df1153a2d9"
+fsType = "xfs"
+flags = ["nofail", "x-gvfs-show"]
+
+[[icedos.hardware.mounts]]
+path = "/mnt/games-ssd-2"
+device = "/dev/disk/by-uuid/a795d62e-67e9-4c15-9282-f48bc70a0cbc"
+fsType = "xfs"
+flags = ["nofail", "x-gvfs-show"]

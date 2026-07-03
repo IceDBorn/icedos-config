@@ -1,0 +1,13 @@
+[[icedos.repositories]]
+url = "github:icedos/tweaks"
+# overrideUrl = "path:/home/ice/Projects/icedos/tweaks"
+modules = [
+  "cachyos",
+  "dmem",
+  "gaming",
+  "kernel",
+]
+
+[icedos.tweaks.cachyos]
+useAdios = true
+useCachyosZramProfile = true
