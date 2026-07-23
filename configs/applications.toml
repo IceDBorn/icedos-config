@@ -3,6 +3,7 @@ url = "github:icedos/apps"
 # overrideUrl = "path:/home/ice/Projects/icedos/apps"
 fetchOptionalDependencies = true
 modules = [
+  "android-tools",
   "bb-launcher",
   "btop",
   "celluloid",
@@ -54,7 +55,7 @@ hash = "sha256-C6oJnFva6Ln360s2PqrlNu5LMi64QMObys573glMXxM="
 [icedos.applications.protonvpn-cli.connect]
 country = "BG"
 
-[icedos.applications.protonvpn-cli.desktopEntry]
+[icedos.applications.protonvpn-cli.desktop-entry]
 countries = ["BG", "GR", "RO"]
 
 [icedos.applications.sd-inhibitor.users.ice.watchers.ports]

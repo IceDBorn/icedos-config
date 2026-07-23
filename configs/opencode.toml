@@ -13,6 +13,11 @@ type = "local"
 enabled = true
 command = ["icedos", "mcp", "serve"]
 
+[icedos.applications.opencode.extraSettings.mcp.chrome-devtools]
+type = "local"
+enabled = true
+command = ["nix-shell", "-p", "nodejs", "--run", "npx -y chrome-devtools-mcp@latest --executable-path=/run/current-system/sw/bin/helium --isolated=true --no-usage-statistics"]
+
 [icedos.applications.opencode.extraSettings.mcp.basic-memory]
 type = "local"
 enabled = true

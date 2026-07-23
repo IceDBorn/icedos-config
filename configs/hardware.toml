@@ -50,11 +50,11 @@ name = "Nvidia Shield Videos"
 path = "/mnt/docker-ssd/videos/shield"
 readOnly = true
 
-[icedos.hardware.network.wakeOnLan]
+[icedos.hardware.network.wake-on-lan]
 interfaces = ["enp9s0"]
 
-[icedos.hardware.pipewire.echoCancellation]
+[icedos.hardware.pipewire.echo-cancellation]
 enable = true
 
-[icedos.hardware.pipewire.noiseCancellation]
+[icedos.hardware.pipewire.noise-cancellation]
 enable = true

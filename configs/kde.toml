@@ -38,10 +38,10 @@ widgets = [
   "org.kde.plasma.lock_logout",
 ]
 
-[icedos.desktop.kde.panel.systemTray]
+[icedos.desktop.kde.panel.system-tray]
 disabledApplets = ["org.kde.plasma.weather"]
 
-[[icedos.desktop.kde.screenEdges]]
+[[icedos.desktop.kde.screen-edges]]
 position = "topLeft"
 action = "none"
 
@@ -50,6 +50,9 @@ action = "none"
 
 [icedos.desktop.kde.shortcuts.bindings."services/org.kde.spectacle.desktop"]
 _launch = [ "Meta+P", "Meta+Π"]
+
+[icedos.desktop.kde.shortcuts.bindings.plasmashell]
+"show-on-mouse-pos" = []
 
 [icedos.desktop.kde.shortcuts.hotkeys.walker-applications]
 name = "Walker"
