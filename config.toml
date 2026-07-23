@@ -9,15 +9,13 @@ description = "IceDBorn"
 packages = [
   "android-studio",
   "faugus-launcher",
-  "shadps4",
-  "shadps4-qtlauncher",
   "signal-desktop",
   "spotube",
 ]
 ssh = true
 version = "25.11"
 
-[icedos.system.buildVm]
+[icedos.system.build-vm]
 cores = 6
 memory = 8192
 

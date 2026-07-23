@@ -82,7 +82,7 @@ overrideUrl = "path:/home/ice/Projects/icedos/apps"   # active = test local apps
 
 ## Gotchas
 - `path:` overrides auto-refresh every build; **core is the exception** (`--update-core`).
-- `icedos configuration show options` browses every option with its effective value
+- `icedos configuration search options` browses every option with its effective value
   (regenerates `.state/.cache/options-doc.json` on demand) — inspect config without building.
 - sunshine / user systemd services aren't restarted by a rebuild — restart them manually
   (`systemctl --user restart …`) to pick up new generated configs.

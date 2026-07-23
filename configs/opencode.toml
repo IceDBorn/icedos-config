@@ -1,3 +1,6 @@
+[icedos.applications.opencode.extraSettings.experimental]
+mcp_timeout = 3600000
+
 [icedos.applications.opencode.extraSettings.mcp.context7]
 type = "local"
 enabled = true
@@ -12,6 +15,11 @@ command = ["nix-shell", "-p", "uv", "--run", "uvx mcp-nixos"]
 type = "local"
 enabled = true
 command = ["icedos", "mcp", "serve"]
+
+[icedos.applications.opencode.extraSettings.mcp.chrome-devtools]
+type = "local"
+enabled = true
+command = ["nix-shell", "-p", "nodejs", "--run", "npx -y chrome-devtools-mcp@latest --executable-path=/run/current-system/sw/bin/helium --isolated=true --no-usage-statistics"]
 
 [icedos.applications.opencode.extraSettings.mcp.basic-memory]
 type = "local"
@@ -142,6 +150,3 @@ description: Use ALWAYS when working on IceDOS — prefer mcp__icedos__* and mcp
 
 **The MCPs are the source of truth.** Never guess, never hand-parse TOML, never grep for option names — ask the MCP.
 """
-
-[icedos.applications.opencode.extraSettings.experimental]
-mcp_timeout = 3600000

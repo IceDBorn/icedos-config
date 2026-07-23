@@ -34,5 +34,5 @@ delay = 0
 [icedos.desktop.users.ice]
 startupScript = "signal-desktop"
 
-[icedos.desktop.xdgDesktopPortal]
+[icedos.desktop.xdg-desktop-portal]
 forceGtkFilePicker = true
