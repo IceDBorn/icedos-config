@@ -5,10 +5,8 @@ fetchOptionalDependencies = true
 modules = [
   "dynamic-workspaces",
   "foreground-booster",
-  "krohnkite",
-  "layout-osd",
   "move-to-desktop-follow",
-  "no-titlebar",
+  "polonium",
   "window-borders",
 ]
 

@@ -9,7 +9,7 @@
       url = "github:nix-community/home-manager";
     };
     icedos-config = {
-      url = "path:/nix/store/dz1lg8rxqm1jywr21fr3zg7f8rl4qfml-icedos-config";
+      url = "path:/nix/store/gibd442sj90xp924m127ghrwq6gcd7vd-icedos-config";
     };
     icedos-core = {
       follows = "icedos-config/icedos";
@@ -18,7 +18,7 @@
       url = "github:icedborn/claude-icedos/50636fbb606d9ad68323b34acd800c5c8988c890";
     };
     icedos-github_icedos_apps = {
-      url = "github:icedos/apps/a144c2fbd2455b02042e663d5e4d2c01d69d033d";
+      url = "github:icedos/apps/f06b68ba0204789e9652d131777b97c336cd2e79";
     };
     icedos-github_icedos_apps-celluloid-celluloid-shader = {
       flake = false;
@@ -66,7 +66,7 @@
       url = "github:xddxdd/nix-cachyos-kernel/release";
     };
     icedos-github_icedos_kde = {
-      url = "github:icedos/kde/8267f840f6c6dbdcf97d69e1dfc59020e2ef40b3";
+      url = "github:icedos/kde/b9b9e6c5aa86ca86f554df12d1aab6d07eeed0cd";
     };
     icedos-github_icedos_kde-default-plasma-manager = {
       inputs = {
