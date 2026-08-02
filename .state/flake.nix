@@ -9,16 +9,16 @@
       url = "github:nix-community/home-manager";
     };
     icedos-config = {
-      url = "path:/nix/store/gibd442sj90xp924m127ghrwq6gcd7vd-icedos-config";
+      url = "path:/nix/store/kssh1myfigjklcxqi5ary08xddyhh25q-icedos-config";
     };
     icedos-core = {
       follows = "icedos-config/icedos";
     };
     icedos-github_icedborn_claude-icedos = {
-      url = "github:icedborn/claude-icedos/50636fbb606d9ad68323b34acd800c5c8988c890";
+      url = "github:icedborn/claude-icedos/99014310750522eb69e9ab7fc9169decbc2222ba";
     };
     icedos-github_icedos_apps = {
-      url = "github:icedos/apps/f06b68ba0204789e9652d131777b97c336cd2e79";
+      url = "github:icedos/apps/51645b8e5a02c41450d753fc23f2feb3e07a8582";
     };
     icedos-github_icedos_apps-celluloid-celluloid-shader = {
       flake = false;
@@ -49,7 +49,7 @@
       url = "github:HikariKnight/ScopeBuddy";
     };
     icedos-github_icedos_desktop = {
-      url = "github:icedos/desktop/c39d812a526458a0fbc5e51bc2bcb49eaed9fc2d";
+      url = "github:icedos/desktop/952740f23750d536edf77d29e87a546d1ed0607d";
     };
     icedos-github_icedos_desktop-stylix-stylix = {
       inputs = {
@@ -60,13 +60,13 @@
       url = "github:nix-community/stylix";
     };
     icedos-github_icedos_hardware = {
-      url = "github:icedos/hardware/5a7f339dd88475071a83b422ab750111085d0f1a";
+      url = "github:icedos/hardware/9af16334830e466b37997a7647a93340d4398809";
     };
     icedos-github_icedos_hardware-cachyos-kernel-nix-cachyos-kernel = {
       url = "github:xddxdd/nix-cachyos-kernel/release";
     };
     icedos-github_icedos_kde = {
-      url = "github:icedos/kde/b9b9e6c5aa86ca86f554df12d1aab6d07eeed0cd";
+      url = "github:icedos/kde/1a8c05a3906132721ccfcc3ea3b183e1092bdae3";
     };
     icedos-github_icedos_kde-default-plasma-manager = {
       inputs = {
@@ -80,7 +80,7 @@
       url = "github:nix-community/plasma-manager";
     };
     icedos-github_icedos_mcp-server = {
-      url = "github:icedos/mcp-server/7c3de382d8d1b3fdaa01130a79712f2fb8dc62f8";
+      url = "github:icedos/mcp-server/7173a1922410298897a5ca84b9561be401ff9c16";
     };
     icedos-github_icedos_providers = {
       url = "github:icedos/providers/38af861c05150dc492dde0128be6941b8d648d75";
@@ -90,7 +90,7 @@
     };
     icedos-state = {
       flake = false;
-      url = "path:/nix/store/b5pb0sszvr7r728vsgc1zyn6xz0sy0ln-icedos";
+      url = "path:/nix/store/im317kbma5zmkvxhf51hlywsp6m5s35i-icedos";
     };
     jovian = {
       inputs = {

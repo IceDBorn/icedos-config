@@ -21,7 +21,7 @@ icon = "blanket"
 
 [icedos.desktop.stylix]
 enable = true
-disabledTargets = ["console", "kmscon"]
+disabledTargets = ["console", "kmscon", "regreet"]
 
 [icedos.desktop.windows]
 maximizeButton = false

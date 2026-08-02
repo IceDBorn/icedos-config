@@ -8,6 +8,7 @@ sunshine_name = "Saloni City"
 colorManagement = true
 excludeHostControllers = false
 hdr = true
+inputInjection = true
 steamOS = true
 
 [icedos.applications.steam.headless-session.desktop-capture]
