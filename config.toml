@@ -2,12 +2,15 @@
 url = "github:icedos/mcp-server"
 # overrideUrl = "path:/home/ice/Projects/icedos/mcp-server"
 
+[[icedos.repositories]]
+url = "github:icedos/providers"
+# overrideUrl = "path:/home/ice/Projects/icedos/providers"
+
 [icedos.users.ice]
 description = "IceDBorn"
 
 [icedos.system]
 packages = [
-  "android-studio",
   "faugus-launcher",
   "signal-desktop",
   "spotube",
@@ -18,6 +21,9 @@ version = "25.11"
 [icedos.system.build-vm]
 cores = 6
 memory = 8192
+
+[icedos.system.cache]
+enable = true
 
 [icedos.system.git.users.ice]
 username = "IceDBorn"

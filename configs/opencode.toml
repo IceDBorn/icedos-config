@@ -1,3 +1,7 @@
+[icedos.applications.opencode.extraSettings]
+model = "opencode-go/kimi-k3"
+small_model = "opencode/big-pickle"
+
 [icedos.applications.opencode.extraSettings.experimental]
 mcp_timeout = 3600000
 
@@ -41,6 +45,18 @@ command = [
     uvx --python 3.13 basic-memory mcp
   """
 ]
+
+[icedos.applications.opencode.extraSettings.agent.explore]
+model = "opencode/big-pickle"
+
+[icedos.applications.opencode.extraSettings.agent.general]
+model = "opencode/big-pickle"
+
+[icedos.applications.opencode.extraSettings.agent.compaction]
+model = "opencode/big-pickle"
+
+[icedos.applications.opencode.extraSettings.agent.summary]
+model = "opencode/big-pickle"
 
 [icedos.applications.opencode.skills]
 memory-first = """

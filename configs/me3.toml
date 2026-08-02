@@ -76,9 +76,9 @@ natives = [
   { name = "increase-animation-distance", path = "/mnt/games-ssd/games/nr/natives/increase-animation-distance.dll" },
   { name = "seamless-coop", path = "/mnt/games-ssd/games/nr/natives/nrsc.dll", load_early = true },
   { name = "storm-control", path = "/mnt/games-ssd/games/nr/natives/storm-control.dll", load_early = true },
+  { name = "timer", path = "/mnt/games-ssd/games/nr/natives/timer.dll" },
   { name = "ultrawide", path = "/mnt/games-ssd/games/nr/natives/ultrawide.dll" },
   { name = "unlock-fps", path = "/mnt/games-ssd/games/nr/natives/unlock-fps.dll" },
-  { name = "vision-of-nightreign", path = "/mnt/games-ssd/games/nr/natives/vision-of-nightreign.dll" },
 ]
 packages = [
   { id = "blue-filter-removal", path = "/mnt/games-ssd/games/nr/packages/blue-filter-removal" },
@@ -94,6 +94,7 @@ natives = [
   "disable-vignette",
   "increase-animation-distance",
   # "seamless-coop",
+  "timer",
   "ultrawide",
   "unlock-fps",
 ]
