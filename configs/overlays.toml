@@ -12,7 +12,7 @@ packages = []
 
 [[icedos.system.overlays.fromChannel]]
 url = "github:nixos/nixpkgs/nixpkgs-unstable"
-packages = []
+packages = ["claude-code"]
 
 [[icedos.system.overlays.fromChannel]]
 url = "github:nixos/nixpkgs/staging-next"

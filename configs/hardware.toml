@@ -3,20 +3,13 @@ url = "github:icedos/hardware"
 # overrideUrl = "path:/home/ice/Projects/icedos/hardware"
 modules = [
   "bluetooth",
-  "cachyos-kernel",
   "disable-ipv6",
-  "kernel",
-  "openrgb",
   "pipewire",
-  "radeon",
   "ryzen",
   "samba",
-  "scx",
   "uinput",
   "upower",
   "wake-on-lan",
-  "xpadneo",
-  "zenergy",
 ]
 
 [icedos.hardware]
@@ -27,18 +20,6 @@ controllerMode = "dual"
 
 [icedos.system.bootloaders.systemd-boot]
 mountPoint = "/boot"
-
-[icedos.hardware.graphics.radeon]
-featureMask = "0xffffffff"
-
-[icedos.hardware.kernel]
-variant = "latest-lto-x86_64-v3"
-
-[icedos.hardware.kernel.scx]
-extraArgs = ["--performance"]
-
-[icedos.hardware.graphics.mesa]
-git = true
 
 [icedos.hardware.network]
 firewall = false

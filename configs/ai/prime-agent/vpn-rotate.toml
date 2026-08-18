@@ -1,0 +1,543 @@
+[icedos.applications.prime-agent.extensions.inline]
+vpn-rotate = '''/**
+ * vpn-rotate: rotate the ProtonVPN egress IP when the model provider
+ * rate-limits (HTTP 404 or 429). Tracks VPN state, detects disconnects,
+ * and publishes the option list (current, all server countries,
+ * disconnect) in the system prompt each turn. Manual control: /vpn.
+ *
+ * - session_start: scan `protonvpn countries list`, `protonvpn status`,
+ *   and remember the public IP the session started with.
+ * - turn_start: re-check the public IP; if it drifted, resync via
+ *   `protonvpn status` (detects manual disconnects and kill-switch drops).
+ *   Subagent sessions skip both scans and leave the run counters alone.
+ * - Root sessions share one tunnel: a lock file in $XDG_RUNTIME_DIR serializes
+ *   rotations, and a session that waited adopts the fresh rotation instead.
+ * - message_end: the main trigger. Providers that go through an SDK client
+ *   (openai-completions, anthropic-messages) reject on a non-2xx status, so
+ *   after_provider_response never sees a 429. The failed turn surfaces as an
+ *   assistant message with stopReason "error", and this handler is awaited
+ *   before the agent decides whether to retry.
+ * - after_provider_response: backup trigger for the fetch-based providers
+ *   that do report a 404/429 status.
+ * - before_agent_start: append the VPN state note to the system prompt.
+ *
+ * Rotating is not enough on its own. The agent reads the reset time the 429
+ * body advertises (~23h for opencode), decides that is beyond
+ * retry.provider.waitForUsage.maxWaitMs, and aborts with "0 attempts" — so
+ * nothing is ever re-sent over the new tunnel. After a rotation this
+ * extension re-issues the interrupted work itself.
+ *
+ * Timeouts rotate too, after the quick retry window (1 + retry.maxRetries
+ * attempts) has failed. The agent then keeps pinging on its own, so the
+ * next ping already uses the new tunnel and no resume message is sent.
+ */
+import type { ExtensionAPI } from "@earendil-works/pi-coding-agent";
+import { closeSync, openSync, readFileSync, renameSync, statSync, unlinkSync, writeFileSync } from "node:fs";
+
+const PROTONVPN = "/run/current-system/sw/bin/protonvpn";
+const LOCAL_PROVIDER = "llamacpp";
+const IP_TIMEOUT_MS = 8000;
+const PROTON_TIMEOUT_MS = 30000;
+const CONNECT_TIMEOUT_MS = 90000;
+const RUNTIME_DIR = process.env.XDG_RUNTIME_DIR || "/tmp";
+const LOCK_PATH = `${RUNTIME_DIR}/prime-agent-vpn-rotate.lock`;
+const SHARED_PATH = `${RUNTIME_DIR}/prime-agent-vpn-rotate.json`;
+const LOCK_STALE_MS = CONNECT_TIMEOUT_MS + 30000;
+
+type SharedRotation = {
+  at: number;
+  egressIp: string | null;
+  country: string | null;
+  server: string | null;
+  location: string | null;
+};
+
+const state = {
+  ready: false,
+  countries: [] as string[],
+  connected: false,
+  country: null as string | null,
+  server: null as string | null,
+  location: null as string | null,
+  startIp: null as string | null,
+  egressIp: null as string | null,
+  rotating: false,
+  rotationsThisRun: 0,
+  lastRotationAt: 0,
+  resumesThisRun: 0,
+  timeoutStreak: 0,
+};
+
+const TIMEOUT_RE = /timed out|timeout|ETIMEDOUT/i;
+// Original attempt + retry.maxRetries (default 3); the extension API does not
+// expose auto_retry_end, so the window is counted here.
+const TIMEOUTS_BEFORE_ROTATE = 4;
+const RATE_LIMIT_RE = /\b(?:429|404)\b|rate limit|too many requests|quota exceeded/i;
+const ROTATE_DEBOUNCE_MS = 10000;
+// Only providers whose limit is keyed to the egress IP; an account-keyed
+// quota survives a rotation and would loop here for nothing.
+const ROTATE_PROVIDERS = new Set(["opencode"]);
+const MAX_RESUMES_PER_RUN = 3;
+
+type Ctx = {
+  hasUI: boolean;
+  model: { provider?: string; baseUrl?: string } | undefined;
+  signal: AbortSignal | undefined;
+  sessionManager: { getHeader(): { rlmDepth?: number } | null };
+  ui: {
+    notify(message: string, type?: "info" | "warning" | "error"): void;
+    setStatus(key: string, text: string | undefined): void;
+  };
+};
+
+type ExecResult = { stdout: string; stderr: string; code: number; killed: boolean };
+
+type AssistantMessage = { role: string; stopReason?: string; errorMessage?: string };
+
+async function runProtonvpn(
+  pi: ExtensionAPI,
+  ctx: Ctx,
+  args: string[],
+  timeoutMs: number,
+  useSignal = true,
+): Promise<ExecResult> {
+  return pi.exec(PROTONVPN, args, { timeout: timeoutMs, ...(useSignal ? { signal: ctx.signal } : {}) });
+}
+
+// Subagent sessions have rlmDepth >= 1. The root session owns the VPN scan and counters.
+function isChild(ctx: Ctx): boolean {
+  try {
+    return (ctx.sessionManager.getHeader()?.rlmDepth ?? 0) > 0;
+  } catch {
+    return false;
+  }
+}
+
+// ctx getters throw once the session is disposed (e.g. a short-lived child);
+// a throw from a catch block becomes an unhandled rejection and kills the worker.
+function say(ctx: Ctx, message: string, type: "info" | "warning" | "error" = "info") {
+  try {
+    if (ctx.hasUI) ctx.ui.notify(message, type);
+  } catch {}
+}
+
+function setFooter(ctx: Ctx, text: string | undefined) {
+  try {
+    if (ctx.hasUI) ctx.ui.setStatus("vpn", text);
+  } catch {}
+}
+
+function footerText(): string {
+  if (!state.ready) return "vpn: initializing";
+  if (state.connected && state.server) {
+    const ip = state.egressIp ? ` egress ${state.egressIp}` : "";
+    return `vpn: ${state.server} (${state.location ?? state.country})${ip}`;
+  }
+  return state.egressIp ? `vpn: disconnected (egress ${state.egressIp})` : "vpn: disconnected";
+}
+
+async function fetchEgressIp(pi: ExtensionAPI, ctx: Ctx): Promise<string | null> {
+  try {
+    const r = await pi.exec("curl", ["-sS", "--max-time", "8", "https://api.ipify.org"], {
+      timeout: IP_TIMEOUT_MS,
+      signal: ctx.signal,
+    });
+    if (r.code === 0) {
+      const ip = r.stdout.trim();
+      if (/^[0-9.]+$/.test(ip)) return ip;
+    }
+  } catch {
+    // lookup failed; keep the previous egress IP rather than guessing
+  }
+  return null;
+}
+
+async function refreshCountries(pi: ExtensionAPI, ctx: Ctx) {
+  const r = await runProtonvpn(pi, ctx, ["countries", "list"], PROTON_TIMEOUT_MS);
+  if (r.code !== 0) {
+    say(ctx, `vpn-rotate: could not list countries: ${r.stderr.trim() || r.stdout.trim()}`, "warning");
+    return;
+  }
+  const codes: string[] = [];
+  for (const line of r.stdout.split("\n")) {
+    const m = line.match(/^(.+?)\s+([A-Z]{2})\s*$/);
+    if (m) codes.push(m[2]);
+  }
+  if (codes.length > 0) {
+    state.countries = codes;
+    state.ready = true;
+  }
+}
+
+async function refreshStatus(pi: ExtensionAPI, ctx: Ctx) {
+  const r = await runProtonvpn(pi, ctx, ["status"], PROTON_TIMEOUT_MS);
+  if (r.code !== 0) {
+    state.connected = false;
+    state.country = null;
+    state.server = null;
+    state.location = null;
+    say(ctx, `vpn-rotate: protonvpn status failed: ${r.stderr.trim() || r.stdout.trim()}`, "warning");
+    return;
+  }
+  const out = r.stdout;
+  if (/^Status:\s*Connected/m.test(out)) {
+    const m = out.match(/^Server:\s*(\S+)\s+in\s+(.+?)\s*$/m);
+    state.connected = true;
+    state.server = m ? m[1] : null;
+    state.location = m ? m[2] : null;
+    state.country = state.server ? state.server.split("#")[0] : null;
+  } else {
+    state.connected = false;
+    state.country = null;
+    state.server = null;
+    state.location = null;
+  }
+}
+
+function nextCountry(): string | null {
+  const n = state.countries.length;
+  if (n === 0) return null;
+  const idx = state.country ? state.countries.indexOf(state.country) : -1;
+  if (idx === -1) return state.countries[0];
+  return state.countries[(idx + 1) % n];
+}
+
+function sleep(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+// O_EXCL lock file; a lock older than one connect attempt is left over from a crash.
+function tryLock(): boolean {
+  for (let attempt = 0; attempt < 2; attempt++) {
+    try {
+      closeSync(openSync(LOCK_PATH, "wx"));
+      return true;
+    } catch (e) {
+      if ((e as NodeJS.ErrnoException).code !== "EEXIST") return true;
+      try {
+        if (Date.now() - statSync(LOCK_PATH).mtimeMs < LOCK_STALE_MS) return false;
+        unlinkSync(LOCK_PATH);
+      } catch {}
+    }
+  }
+  return false;
+}
+
+function unlock() {
+  try {
+    unlinkSync(LOCK_PATH);
+  } catch {}
+}
+
+function readShared(): SharedRotation | null {
+  try {
+    return JSON.parse(readFileSync(SHARED_PATH, "utf8")) as SharedRotation;
+  } catch {
+    return null;
+  }
+}
+
+function writeShared() {
+  const rec: SharedRotation = {
+    at: Date.now(),
+    egressIp: state.egressIp,
+    country: state.country,
+    server: state.server,
+    location: state.location,
+  };
+  try {
+    writeFileSync(`${SHARED_PATH}.tmp`, JSON.stringify(rec));
+    renameSync(`${SHARED_PATH}.tmp`, SHARED_PATH);
+  } catch {}
+}
+
+async function rotate(pi: ExtensionAPI, ctx: Ctx, reason: string): Promise<boolean> {
+  if (state.rotating) return false;
+  const failedAt = Date.now();
+  if (state.countries.length === 0) await refreshCountries(pi, ctx);
+  if (state.countries.length === 0) {
+    say(ctx, "vpn-rotate: country list unavailable, cannot rotate.", "warning");
+    return false;
+  }
+  if (state.rotationsThisRun >= state.countries.length) {
+    say(ctx, "vpn-rotate: tried every country this run; stopping until the next prompt.", "warning");
+    return false;
+  }
+  state.rotating = true;
+  try {
+    // Other root sessions share the tunnel and usually hit the same limit at once.
+    while (!tryLock()) {
+      if (Date.now() - failedAt > LOCK_STALE_MS) {
+        say(ctx, "vpn-rotate: another session holds the rotation lock; giving up.", "warning");
+        return false;
+      }
+      await sleep(1000);
+    }
+    try {
+      const recent = readShared();
+      if (recent && recent.at >= failedAt - ROTATE_DEBOUNCE_MS) {
+        state.connected = true;
+        state.country = recent.country;
+        state.server = recent.server;
+        state.location = recent.location;
+        state.egressIp = recent.egressIp;
+        setFooter(ctx, footerText());
+        say(ctx, `vpn-rotate: ${reason}; another session already rotated to ${state.server ?? state.country}, egress ${state.egressIp ?? "unknown"}.`);
+        return true;
+      }
+      // Another session may have moved the tunnel since this one last looked.
+      await refreshStatus(pi, ctx);
+      const target = nextCountry();
+      if (!target) return false;
+      state.rotationsThisRun += 1;
+      say(ctx, `vpn-rotate: ${reason}; switching to ${target}...`);
+      let r: ExecResult;
+      try {
+        r = await runProtonvpn(pi, ctx, ["connect", "--country", target], CONNECT_TIMEOUT_MS, false);
+      } catch (e) {
+        say(ctx, `vpn-rotate: connect to ${target} interrupted: ${e}`, "error");
+        return false;
+      }
+      const out = `${r.stdout}\n${r.stderr}`;
+      if (r.code !== 0) {
+        say(ctx, `vpn-rotate: connect to ${target} failed: ${out.trim()}`, "error");
+        return false;
+      }
+      const conn = out.match(/Connected to (\S+) in (.+?)\.\s*$/m);
+      const ipMatch = out.match(/Your new IP address is ([0-9.]+)\./m);
+      state.connected = true;
+      state.country = target;
+      if (conn) {
+        state.server = conn[1];
+        state.location = conn[2];
+      }
+      state.egressIp = ipMatch ? ipMatch[1] : await fetchEgressIp(pi, ctx);
+      await refreshStatus(pi, ctx);
+      writeShared();
+      setFooter(ctx, footerText());
+      say(ctx, `vpn-rotate: now on ${state.server ?? target} in ${state.location ?? target}, egress ${state.egressIp ?? "unknown"}.`);
+      return true;
+    } finally {
+      unlock();
+    }
+  } finally {
+    state.rotating = false;
+  }
+}
+
+async function maybeRotate(pi: ExtensionAPI, ctx: Ctx, reason: string, sendResume = true) {
+  const provider = ctx.model?.provider;
+  const baseUrl = ctx.model?.baseUrl ?? "";
+  if (provider === LOCAL_PROVIDER || /localhost|127\.0\.0\.1|\[::1\]/.test(baseUrl)) return;
+  if (!provider || !ROTATE_PROVIDERS.has(provider)) return;
+  if (!state.ready) return;
+  // One 429 produces both a status hook and an error message; rotate once.
+  if (Date.now() - state.lastRotationAt < ROTATE_DEBOUNCE_MS) return;
+  state.lastRotationAt = Date.now();
+  let rotated = false;
+  try {
+    rotated = await rotate(pi, ctx, reason);
+  } catch (e) {
+    say(ctx, `vpn-rotate: rotation error: ${e}`, "error");
+    return;
+  }
+  if (!rotated || !sendResume) return;
+  if (state.resumesThisRun >= MAX_RESUMES_PER_RUN) {
+    say(ctx, `vpn-rotate: rotated, but already resumed ${MAX_RESUMES_PER_RUN}x this run; continue manually.`, "warning");
+    return;
+  }
+  state.resumesThisRun += 1;
+  // The agent aborts without re-sending, so the new tunnel is only used if
+  // we ask for the work again ourselves.
+  const resume = `The provider rate-limited the previous request. The VPN egress IP has been rotated to ${state.egressIp ?? "a new address"} (${state.location ?? state.country}). Retry the interrupted work from where it stopped. Do not run protonvpn yourself.`;
+  void Promise.resolve()
+    .then(() =>
+      pi.sendMessage(
+        {
+          customType: "vpn-rotate-resume",
+          content: resume,
+          display: true,
+          details: { egressIp: state.egressIp, server: state.server, attempt: state.resumesThisRun },
+        },
+        { deliverAs: "followUp", triggerTurn: true },
+      ),
+    )
+    .catch((e) => say(ctx, `vpn-rotate: rotated, but could not resume automatically: ${e}`, "warning"));
+}
+
+async function resyncIfDrifted(pi: ExtensionAPI, ctx: Ctx) {
+  const ip = await fetchEgressIp(pi, ctx);
+  if (!ip || ip === state.egressIp) return;
+  const wasConnected = state.connected;
+  state.egressIp = ip;
+  await refreshStatus(pi, ctx);
+  if (wasConnected && !state.connected) {
+    say(ctx, `vpn-rotate: VPN disconnected (egress reverted to ${ip}).`);
+  } else if (!wasConnected && state.connected) {
+    say(ctx, `vpn-rotate: VPN connected to ${state.server ?? state.country} in ${state.location ?? state.country}.`);
+  }
+}
+
+function vpnNote(): string {
+  const lines = ["VPN (ProtonVPN, managed by the vpn-rotate extension):"];
+  if (!state.ready) {
+    lines.push("- state unknown (initializing). Options: keep current, connect to a listed country, disconnect.");
+    return lines.join("\n");
+  }
+  lines.push(`- egress IP at session start: ${state.startIp ?? "unknown"}`);
+  if (state.connected) {
+    lines.push(`- current: connected to ${state.server ?? state.country} in ${state.location ?? state.country} (egress ${state.egressIp ?? "unknown"})`);
+  } else {
+    lines.push(`- current: disconnected (egress ${state.egressIp ?? state.startIp ?? "unknown"})`);
+  }
+  if (state.countries.length > 0) {
+    lines.push(`- all server countries: ${state.countries.join(" ")}`);
+  }
+  lines.push("- options: keep current, connect to any listed country, or disconnect.");
+  lines.push("- On an opencode rate limit (HTTP 404/429, a turn that fails with a rate-limit error, or repeated request timeouts) this extension rotates the VPN server and then asks you to retry the interrupted work. Do not run protonvpn connect or disconnect yourself.");
+  return lines.join("\n");
+}
+
+export default function vpnRotate(pi: ExtensionAPI) {
+  pi.on("session_start", (_event, ctx: Ctx) => {
+    if (isChild(ctx)) return;
+    void (async () => {
+      try {
+        const ip = await fetchEgressIp(pi, ctx);
+        state.startIp = ip;
+        state.egressIp = ip;
+        await refreshCountries(pi, ctx);
+        await refreshStatus(pi, ctx);
+        setFooter(ctx, footerText());
+      } catch (e) {
+        say(ctx, `vpn-rotate: startup scan failed: ${e}`, "error");
+      }
+    })();
+  });
+
+  pi.on("agent_start", (_event, ctx: Ctx) => {
+    if (isChild(ctx)) return;
+    state.rotationsThisRun = 0;
+    state.resumesThisRun = 0;
+  });
+
+  pi.on("turn_start", (_event, ctx: Ctx) => {
+    if (isChild(ctx)) return;
+    void (async () => {
+      try {
+        await resyncIfDrifted(pi, ctx);
+        setFooter(ctx, footerText());
+      } catch {
+        // ignore; next turn retries
+      }
+    })();
+  });
+
+  pi.on("after_provider_response", async (event, ctx: Ctx) => {
+    if (event.status !== 404 && event.status !== 429) return;
+    await maybeRotate(pi, ctx, `HTTP ${event.status} from provider`);
+  });
+
+  pi.on("message_end", async (event: { message: AssistantMessage }, ctx: Ctx) => {
+    const m = event.message;
+    if (m.role !== "assistant") return;
+    if (m.stopReason !== "error" || !m.errorMessage) {
+      state.timeoutStreak = 0;
+      return;
+    }
+    if (RATE_LIMIT_RE.test(m.errorMessage)) {
+      await maybeRotate(pi, ctx, "rate limit hit");
+      return;
+    }
+    if (!TIMEOUT_RE.test(m.errorMessage)) return;
+    state.timeoutStreak += 1;
+    if (state.timeoutStreak < TIMEOUTS_BEFORE_ROTATE) return;
+    state.timeoutStreak = 0;
+    await maybeRotate(pi, ctx, `${TIMEOUTS_BEFORE_ROTATE} request timeouts in a row`, false);
+  });
+
+  pi.on("before_agent_start", (event, ctx: Ctx) => {
+    setFooter(ctx, footerText());
+    return {
+      systemPrompt: `${event.systemPrompt}\n\n${vpnNote()}`,
+    };
+  });
+
+  pi.on("session_shutdown", (_event, ctx: Ctx) => {
+    setFooter(ctx, undefined);
+    state.ready = false;
+    state.countries = [];
+    state.connected = false;
+    state.country = null;
+    state.server = null;
+    state.location = null;
+    state.startIp = null;
+    state.egressIp = null;
+    state.rotating = false;
+    state.rotationsThisRun = 0;
+    state.lastRotationAt = 0;
+    state.resumesThisRun = 0;
+    state.timeoutStreak = 0;
+  });
+
+  pi.registerCommand("/vpn", {
+    description: "Show ProtonVPN state; /vpn disconnect or /vpn connect <COUNTRY_CODE>.",
+    handler: async (args, ctx: Ctx) => {
+      const a = args.trim();
+      if (a === "") {
+        say(ctx, `${footerText()} | countries: ${state.countries.join(" ") || "(unknown)"}`);
+        return;
+      }
+      if (a === "disconnect") {
+        let r: ExecResult;
+        try {
+          r = await runProtonvpn(pi, ctx, ["disconnect"], PROTON_TIMEOUT_MS);
+        } catch (e) {
+          say(ctx, `vpn: disconnect interrupted: ${e}`, "error");
+          return;
+        }
+        if (r.code === 0) {
+          state.connected = false;
+          state.country = null;
+          state.server = null;
+          state.location = null;
+          state.egressIp = await fetchEgressIp(pi, ctx);
+          setFooter(ctx, footerText());
+          say(ctx, "vpn: disconnected.");
+        } else {
+          say(ctx, `vpn: disconnect failed: ${r.stderr.trim() || r.stdout.trim()}`, "error");
+        }
+        return;
+      }
+      const m = a.match(/^connect\s+([A-Za-z]{2,30})$/);
+      if (m) {
+        const target = m[1].toUpperCase();
+        let r: ExecResult;
+        try {
+          r = await runProtonvpn(pi, ctx, ["connect", "--country", target], CONNECT_TIMEOUT_MS);
+        } catch (e) {
+          say(ctx, `vpn: connect to ${target} interrupted: ${e}`, "error");
+          return;
+        }
+        if (r.code === 0) {
+          const out = `${r.stdout}\n${r.stderr}`;
+          const conn = out.match(/Connected to (\S+) in (.+?)\.\s*$/m);
+          const ipMatch = out.match(/Your new IP address is ([0-9.]+)\./m);
+          state.connected = true;
+          state.country = target;
+          if (conn) {
+            state.server = conn[1];
+            state.location = conn[2];
+          }
+          state.egressIp = ipMatch ? ipMatch[1] : await fetchEgressIp(pi, ctx);
+          setFooter(ctx, footerText());
+          say(ctx, `vpn: connected to ${state.server ?? target} in ${state.location ?? target}.`);
+        } else {
+          say(ctx, `vpn: connect to ${target} failed: ${r.stderr.trim() || r.stdout.trim()}`, "error");
+        }
+        return;
+      }
+      say(ctx, "usage: /vpn | /vpn disconnect | /vpn connect <COUNTRY_CODE>");
+    },
+  });
+}'''

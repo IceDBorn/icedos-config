@@ -1,0 +1,178 @@
+[[icedos.repositories]]
+url = "github:icedos/apps"
+modules = ["prime-agent"]
+
+[icedos.applications.prime-agent]
+includeInIcedosGc = true
+sessionRetentionDays = 7
+
+[icedos.applications.prime-agent.default]
+model = "big-pickle"
+provider = "opencode"
+
+[icedos.applications.prime-agent.settings]
+auxiliaryModel = "opencode/big-pickle"
+imageModel = "llamacpp/Qwen3.8-27B-GSQ-RCO-IQ3_XXS+MTP"
+
+[icedos.applications.prime-agent.settings.providers.opencode.modelOverrides.big-pickle]
+contextWindow = 210000
+
+[icedos.applications.prime-agent.extensions]
+builtin = [
+  "confirm-destructive",
+  "git-checkpoint",
+  "todo",
+]
+
+[icedos.applications.prime-agent.extensions.context-window-cap]
+enable = true
+
+[icedos.applications.prime-agent.extensions.meters.power]
+enable = true
+currency = "€"
+idleWatts = 37
+rateKwh = 0.1829
+windows = ["1m", "1h", "1d", "1w", "1M"]
+
+[icedos.applications.prime-agent.extensions.inline]
+comment-rules = """
+/** Persistent minimal-comments rule, appended to the system prompt each turn. */
+
+import type { ExtensionAPI } from "@earendil-works/pi-coding-agent";
+
+const RULE = `
+CODE COMMENT POLICY (always):
+- Comments at most 2 lines, single line preferred.
+- No multi-line header blocks; no restating what code obviously does.
+- Comment only where non-obvious (tricky logic, constraints).
+- When editing existing code, trim new comments to the minimum needed.`;
+
+// Append the rule to the chained system prompt before each turn.
+export default function commentRules(pi: ExtensionAPI) {
+	pi.on("before_agent_start", (event) => {
+		return {
+			systemPrompt: `${event.systemPrompt}
+
+${RULE}`,
+		};
+	});
+}
+"""
+
+clean-leftovers = """
+/** Persistent leftover-cleanup rule, appended to the system prompt each turn. */
+
+import type { ExtensionAPI } from "@earendil-works/pi-coding-agent";
+
+const RULE = `
+LEFTOVER CLEANUP (always):
+- Before finishing a task, delete every leftover you created: temp files, scratch scripts, state or round files, logs, test outputs, backup copies.
+- Stop background processes, dev servers and subagent sessions you started.
+- Remove debug prints and throwaway code you added.
+- Keep only what the user asked for. If unsure whether a file is wanted, ask instead of leaving it.`;
+
+// Append the rule to the chained system prompt before each turn.
+export default function cleanLeftovers(pi: ExtensionAPI) {
+	pi.on("before_agent_start", (event) => {
+		return {
+			systemPrompt: `${event.systemPrompt}
+
+${RULE}`,
+		};
+	});
+}
+"""
+
+local-images = """
+/** Persistent local-vision rule, appended to the system prompt each turn. */
+
+import type { ExtensionAPI } from "@earendil-works/pi-coding-agent";
+
+const RULE = `
+IMAGE FILES (always):
+- Pasted images route to the image model automatically. For an image file on disk, attach_image refuses on a text-only model, so spawn a vision child instead:
+  child = await rlm.spawn("Run: print(await attach_image('/abs/path.png')). Then <the user's question>. Reply with the full answer.", name="local-vision", model="llamacpp/Qwen3.8-27B-GSQ-RCO-IQ3_XXS+MTP")
+  result = (await rlm.collect(child, timeout_ms=600000))[0]
+- If status is not "done", collect again instead of spawning a second child (llama-server can take a minute to load). Relay the answer, then await rlm.delete_subagent(child).`;
+
+// Append the rule to the chained system prompt before each turn.
+export default function localImages(pi: ExtensionAPI) {
+	pi.on("before_agent_start", (event) => {
+		return {
+			systemPrompt: `${event.systemPrompt}
+
+${RULE}`,
+		};
+	});
+}
+"""
+
+local-gpu-guard = """
+/** Persistent GPU-contention rule for the local model, appended to the system prompt each turn. */
+
+import type { ExtensionAPI } from "@earendil-works/pi-coding-agent";
+
+const RULE = `
+LOCAL MODEL GPU CHECK (always):
+- Use the local llamacpp model only when the GPU is free. Check right before every local model call, including subagents.
+- The card number changes between boots and machines, so never hardcode it. List AMD cards with:
+  for d in /sys/class/drm/card[0-9]*/device; do [ -r $d/gpu_busy_percent ] && echo "$d busy=$(cat $d/gpu_busy_percent) used=$(cat $d/mem_info_vram_used) total=$(cat $d/mem_info_vram_total)"; done; pgrep -x llama-server
+- Judge the card with the largest VRAM total. If none is listed, use: nvidia-smi --query-gpu=utilization.gpu,memory.used,memory.total --format=csv
+- The GPU is in use if busy is above 30%, or if llama-server is not running and VRAM used is above 4 GiB (4294967296 bytes).
+- If the GPU is in use, do not start or call the local model. Use a cloud model instead and tell the user why.`;
+
+// Append the rule to the chained system prompt before each turn.
+export default function localGpuGuard(pi: ExtensionAPI) {
+	pi.on("before_agent_start", (event) => {
+		return {
+			systemPrompt: `${event.systemPrompt}
+
+${RULE}`,
+		};
+	});
+}
+"""
+
+[icedos.applications.prime-agent.skills.extraBuiltin]
+free-review = '''
+---
+name: free-review
+description: Review your changes with the code review skill in a review-until-clean loop, using only free models as subagents, preferring opencode, then ollama, then openrouter, then the local llamacpp model. Use when the user asks for a free review or asks to review until no findings remain.
+---
+
+# Free review
+
+Read the code review skill, then review your changes with it in its review-until-clean loop, following these rules:
+
+1. Use only the free models listed below as subagents, and no other provider or model.
+2. Pick models in the provider order below. Move to the next provider only when every model of the earlier ones is rate limited or failing, and only for the rest of that round.
+3. Goal is considered complete on no findings.
+
+## Provider order
+
+Do not use rlm.find_models() for this. It returns at most 20 matches, has no price field, and its free-text search misses most free models. List the models from the shell instead:
+
+```bash
+prime-agent model list 2>&1 | awk '$1 == "opencode" || $1 == "ollama" || $1 == "openrouter" || $1 == "llamacpp"'
+```
+
+Pass each one to rlm.spawn as model="<provider>/<model id>", exactly as listed.
+
+1. opencode: opencode/big-pickle, plus opencode models whose id ends in "-free".
+2. ollama: only gemma4:31b, gpt-oss:120b, gpt-oss:20b, nemotron-3-nano:30b, nemotron-3-super and nemotron-3-ultra. The free plan allows one request at a time, so run at most one ollama subagent at a time.
+3. openrouter: models whose id ends in ":free". Skip openrouter/free, which is a router, not a model. The account allows only 10 free requests a day, and each subagent turn is one request, so spawn openrouter models only when opencode and ollama cannot take the task.
+4. llamacpp: llamacpp/Qwen3.8-27B-GSQ-RCO-IQ3_XXS+MTP, only when the GPU check passes.
+
+If ollama or openrouter returns a quota, plan or rate-limit error, stop using that provider for the rest of the review.
+
+## When a subagent fails
+
+Rate limits on openrouter and ollama apply per API key, so a VPN rotation does not clear them. Only opencode limits by IP.
+
+- A child that ends on a provider error reports back as `[child-failed child:<name>]` followed by the error. Treat `[child-exited: no-reply child:<name>]` as a failure too.
+- A child that is waiting on a rate limit or quota shows a "provider retry" note in `progress_note`. Check `await rlm.collect(timeout_ms=0)` when a child is slow, and delete it with `await rlm.delete_subagent(child)` if the note names a rate limit, a quota, or a wait longer than a minute.
+- After any of these, mark that model as failing for the rest of the review and spawn the same task on another free model. Do not retry the failed model, and do not end the round with a task that no child finished.
+- Before you report a round as clean, confirm every reviewer child in it finished with a reply. A round with a failed reviewer is not a clean round.
+
+Create a persistent goal with the goal skill. Its objective must name your round state file and tell you to re-read the code-review skill at the start of every round, as the code review skill requires.
+'''

@@ -1,0 +1,13 @@
+[[icedos.repositories]]
+url = "github:icedos/apps"
+modules = ["peon-ping"]
+
+[icedos.applications.peon-ping.users.ice]
+defaultPack = "ds1-siegmeyer"
+
+[[icedos.applications.peon-ping.users.ice.customPacks]]
+name = "ds1-siegmeyer"
+owner = "jmfiebak"
+repo = "openpeon-siegmeyer-sound-pack"
+rev = "v1.0.1"
+hash = "sha256-C6oJnFva6Ln360s2PqrlNu5LMi64QMObys573glMXxM="

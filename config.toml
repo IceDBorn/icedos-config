@@ -1,8 +1,4 @@
 [[icedos.repositories]]
-url = "github:icedos/mcp-server"
-# overrideUrl = "path:/home/ice/Projects/icedos/mcp-server"
-
-[[icedos.repositories]]
 url = "github:icedos/providers"
 # overrideUrl = "path:/home/ice/Projects/icedos/providers"
 
@@ -11,9 +7,7 @@ description = "IceDBorn"
 
 [icedos.system]
 packages = [
-  "faugus-launcher",
   "signal-desktop",
-  "spotube",
 ]
 ssh = true
 version = "25.11"
@@ -24,7 +18,15 @@ memory = 8192
 
 [icedos.system.cache]
 enable = true
+pinInputs = true
 
 [icedos.system.git.users.ice]
 username = "IceDBorn"
 email = "git.outsider841@simplelogin.fr"
+
+[icedos.system.zsh.aliases]
+u = """
+  cd /home/ice/Projects/icedos &&
+  icedos git rpull &&
+  icedos rebuild --update
+"""

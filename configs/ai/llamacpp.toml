@@ -1,0 +1,43 @@
+[[icedos.repositories]]
+url = "github:icedos/apps"
+modules = ["llamacpp"]
+
+[icedos.applications.llamacpp]
+patches = [
+  { url = "https://github.com/ggml-org/llama.cpp/pull/25592.diff", hash = "sha256-F3xksk8w9KjVjQIP7SoTJxmeAvfwuHtDfua/e3W0GCM=" },
+  { url = "https://github.com/ggml-org/llama.cpp/pull/27694.diff", hash = "sha256-olD675PE7BmTz2NfQj0xwzY017WjUhF7kpyTRMz1UeQ=" },
+  { url = "https://github.com/ggml-org/llama.cpp/pull/28507.diff", hash = "sha256-w2vp8CdYk7ksf8XiaW8WEdpcbzRbXV6JJCOJXXYWTk8=" },
+]
+priorityUsers = ["ice"]
+
+[icedos.applications.llamacpp.lifecycle]
+idle = 120
+
+[icedos.applications.llamacpp.settings]
+flashAttn = true
+
+[icedos.applications.llamacpp.settings.cache]
+typeK = "q8_0"
+typeV = "q8_0"
+
+[icedos.applications.llamacpp.settings.mmproj]
+offload = false
+path = "/home/ice/.local/share/llamacpp/models/mmproj-Qwen3.8-27B-BF16.gguf"
+
+[icedos.applications.llamacpp.settings.model]
+contextSize = 104858
+path = "/home/ice/.local/share/llamacpp/models/Qwen3.8-27B-GSQ-RCO-IQ3_XXS+MTP.gguf"
+
+[icedos.applications.llamacpp.settings.model.thinking-level-map]
+minimal = "low"
+high = "xhigh"
+
+[icedos.applications.llamacpp.settings.server]
+parallel = 1
+
+[icedos.applications.llamacpp.settings.spec]
+type = "ngram-mod,draft-mtp"
+
+[icedos.applications.llamacpp.settings.spec.draft]
+nMax = 2
+sampling = "probabilistic"
