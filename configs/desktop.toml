@@ -20,8 +20,12 @@ exec = "icedos pkgs run blanket"
 icon = "blanket"
 
 [icedos.desktop.stylix]
-enable = true
-disabledTargets = ["console", "kmscon", "regreet"]
+disabledTargets = [
+  "console",
+  "kmscon",
+  "regreet",
+  "zed",
+]
 
 [icedos.desktop.windows]
 maximizeButton = false

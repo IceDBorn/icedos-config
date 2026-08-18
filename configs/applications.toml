@@ -17,9 +17,9 @@ modules = [
   "ncdu",
   "nx-optimizer",
   "obs",
-  "opencode",
   "peon-ping",
   "prefixer",
+  "prime-agent",
   "proton-launch",
   "protonvpn-cli",
   "reigntweak",
@@ -52,6 +52,9 @@ repo = "openpeon-siegmeyer-sound-pack"
 rev = "v1.0.1"
 hash = "sha256-C6oJnFva6Ln360s2PqrlNu5LMi64QMObys573glMXxM="
 
+[icedos.applications.proton-launch]
+presentMode = "immediate"
+
 [icedos.applications.protonvpn-cli.connect]
 country = "BG"
 
@@ -77,6 +80,9 @@ includeInIcedosGc = true
 
 [icedos.applications.zed]
 vim = true
+
+[icedos.applications.zed.font]
+size = 12
 
 [icedos.applications.zed.lsp.taplo.settings.formatter]
 alignComments = false

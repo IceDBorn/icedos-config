@@ -1,0 +1,35 @@
+[[icedos.repositories]]
+url = "github:icedos/mcp-server"
+# overrideUrl = "path:/home/ice/Projects/icedos/mcp-server"
+
+[home-manager.users.ice.programs.mcp]
+enable = true
+
+[home-manager.users.ice.programs.mcp.servers.basic-memory]
+command = "nix-shell"
+args = [
+  "-p",
+  "uv",
+  "python313",
+  "stdenv.cc.cc.lib",
+  "gcc",
+  "--run",
+  "export BASIC_MEMORY_CONFIG_DIR=\"$HOME/.config/basic-memory\"; export BASIC_MEMORY_HOME=\"$HOME/.local/share/basic-memory\"; export BASIC_MEMORY_FORCE_LOCAL=true; export LD_LIBRARY_PATH=$(dirname $(gcc -print-file-name=libstdc++.so.6)):$LD_LIBRARY_PATH; uvx --python 3.13 basic-memory mcp",
+]
+
+[home-manager.users.ice.programs.mcp.servers.icedos]
+command = "icedos"
+args = ["mcp", "serve"]
+timeout = 3600000
+
+[home-manager.users.ice.programs.mcp.servers.nixos]
+command = "nix-shell"
+args = ["-p", "mcp-nixos", "--run", "mcp-nixos"]
+
+[home-manager.users.ice.programs.mcp.servers.chrome-devtools]
+command = "nix-shell"
+args = ["-p", "nodejs", "--run", "npx -y chrome-devtools-mcp@latest --executable-path=/run/current-system/sw/bin/helium --isolated=true --no-usage-statistics"]
+timeout = 600000
+
+[home-manager.users.ice.programs.mcp.servers.context7]
+url = "https://mcp.context7.com/mcp"

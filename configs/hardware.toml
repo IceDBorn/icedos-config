@@ -12,6 +12,7 @@ modules = [
   "ryzen",
   "samba",
   "scx",
+  "steam-wayland-overlay",
   "uinput",
   "upower",
   "wake-on-lan",

@@ -9,16 +9,16 @@
       url = "github:nix-community/home-manager";
     };
     icedos-config = {
-      url = "path:/nix/store/f21xy93xlsgs4il1fmpwgaqjn4zjjn3q-icedos-config";
+      url = "path:/nix/store/m90vgdgvj1f97jwzx612rf6x9lckxibn-icedos-config";
     };
     icedos-core = {
       follows = "icedos-config/icedos";
     };
     icedos-github_icedborn_claude-icedos = {
-      url = "github:icedborn/claude-icedos/e77cd93377e2cf97bd25fbcc8e762f57797b8011";
+      url = "path:/home/ice/Projects/icedos/claude-icedos";
     };
     icedos-github_icedos_apps = {
-      url = "github:icedos/apps/633017914a460ec729a2ad75656b448cee531ef0";
+      url = "github:icedos/apps/f2f9ad00ba42756467feeb2e007ec009d906066f";
     };
     icedos-github_icedos_apps-celluloid-celluloid-shader = {
       flake = false;
@@ -49,7 +49,7 @@
       url = "github:HikariKnight/ScopeBuddy";
     };
     icedos-github_icedos_desktop = {
-      url = "github:icedos/desktop/e5375cb3e42cf62b4b9c95de7a43ad6acb18f5dc";
+      url = "github:icedos/desktop/434a2504deb85c07eee44b57503ef02f3757726d";
     };
     icedos-github_icedos_desktop-stylix-stylix = {
       inputs = {
@@ -60,13 +60,13 @@
       url = "github:nix-community/stylix";
     };
     icedos-github_icedos_hardware = {
-      url = "github:icedos/hardware/765bd869926b848c33b9ddfa675c27a21d0cef45";
+      url = "github:icedos/hardware/8373b803885df343b664daac90e69374c951478a";
     };
     icedos-github_icedos_hardware-cachyos-kernel-nix-cachyos-kernel = {
       url = "github:xddxdd/nix-cachyos-kernel/release";
     };
     icedos-github_icedos_kde = {
-      url = "github:icedos/kde/074e9393b76001ebb7540039a540907fe94b7ef9";
+      url = "github:icedos/kde/8ee796d02fa400e8ff0786425a4895249102166c";
     };
     icedos-github_icedos_kde-default-plasma-manager = {
       inputs = {
