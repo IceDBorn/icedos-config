@@ -1,0 +1,9 @@
+[[icedos.repositories]]
+url = "github:icedos/apps"
+modules = ["nx-optimizer"]
+
+[icedos.applications.steam]
+extraPackages = ["eden"]
+
+[icedos.system]
+packages = ["eden"]

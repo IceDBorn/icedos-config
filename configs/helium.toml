@@ -1,3 +1,7 @@
+[[icedos.repositories]]
+url = "github:icedos/apps"
+modules = ["helium"]
+
 [[icedos.applications.helium.profiles]]
 exec = "helium-discord"
 name = "Discord"

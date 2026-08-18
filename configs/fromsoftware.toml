@@ -1,3 +1,13 @@
+[[icedos.repositories]]
+url = "github:icedos/apps"
+modules = [
+  "bb-launcher",
+  "me3",
+  "reigntweak",
+  "sekirofpsunlock",
+  "shadps4",
+]
+
 [icedos.applications.me3.games.eldenring]
 profileVersion = "v1"
 disable_arxan = true
@@ -69,16 +79,18 @@ profileVersion = "v1"
 disable_arxan = true
 start_online = true
 natives = [
-  { name = "cl-server-redirector", path = "/mnt/games-ssd/games/nr/natives/cl_server_redirector.dll" },
+  { name = "cl-server-redirector", path = "/mnt/games-ssd/games/nr/packages/variations/output/dll/ServerRedirector/cl_server_redirector.dll", load_early = true },
+  { name = "custom_drop_fxrs", path = "/mnt/games-ssd/games/nr/packages/variations/output/dll/custom_drop_fxrs.dll", load_early = true },
   { name = "disable-chromatic-aberration", path = "/mnt/games-ssd/games/nr/natives/disable-chromatic-aberration.dll" },
   { name = "disable-sharpening", path = "/mnt/games-ssd/games/nr/natives/disable-sharpening.dll" },
   { name = "disable-vignette", path = "/mnt/games-ssd/games/nr/natives/disable-vignette.dll" },
-  { name = "increase-animation-distance", path = "/mnt/games-ssd/games/nr/natives/increase-animation-distance.dll" },
+  { name = "nrallinone", path = "/mnt/games-ssd/games/nr/packages/variations/output/dll/target/release/nrallinone.dll", load_early = true },
   { name = "seamless-coop", path = "/mnt/games-ssd/games/nr/natives/nrsc.dll", load_early = true },
   { name = "storm-control", path = "/mnt/games-ssd/games/nr/natives/storm-control.dll", load_early = true },
   { name = "timer", path = "/mnt/games-ssd/games/nr/natives/timer.dll" },
   { name = "ultrawide", path = "/mnt/games-ssd/games/nr/natives/ultrawide.dll" },
   { name = "unlock-fps", path = "/mnt/games-ssd/games/nr/natives/unlock-fps.dll" },
+  { name = "unlock_wwise_states_nr", path = "/mnt/games-ssd/games/nr/packages/variations/output/dll/unlock_wwise_states_nr.dll", load_early = true },
 ]
 packages = [
   { id = "blue-filter-removal", path = "/mnt/games-ssd/games/nr/packages/blue-filter-removal" },
@@ -92,7 +104,6 @@ natives = [
   "disable-chromatic-aberration",
   "disable-sharpening",
   "disable-vignette",
-  "increase-animation-distance",
   # "seamless-coop",
   "timer",
   "ultrawide",
@@ -111,3 +122,12 @@ natives = ["storm-control"]
 name = "nr-variations"
 dependencies = ["nr-storm-control"]
 packages = ["variations"]
+natives = [
+  "custom_drop_fxrs",
+  "nrallinone",
+  "unlock_wwise_states_nr"
+]
+
+[icedos.applications.shadps4]
+prerelease = true
+shadnet = true

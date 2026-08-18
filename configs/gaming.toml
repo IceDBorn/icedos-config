@@ -1,0 +1,67 @@
+[[icedos.repositories]]
+url = "github:icedos/apps"
+modules = [
+  "gamescope",
+  "lact",
+  "mangohud",
+  "prefixer",
+  "proton-launch",
+  "steam-sunshine-headless-session",
+  "unshade",
+]
+
+[[icedos.repositories]]
+url = "github:icedos/hardware"
+modules = [
+  "cachyos-kernel",
+  "kernel",
+  "openrgb",
+  "radeon",
+  # "scx",
+  "steam-wayland-overlay",
+  "xpadneo",
+  "zenergy",
+]
+
+[icedos.applications.mangohud]
+fpsLimit = "0,144,60,30"
+
+[icedos.applications.proton-launch]
+presentMode = "immediate"
+
+[icedos.applications.steam]
+beta = true
+cpuUsageWorkaround = true
+downloadsWorkaround = true
+
+[icedos.applications.steam.headless-session]
+excludeHostControllers = false
+name = "Saloni City"
+
+[icedos.applications.sunshine]
+capSysAdmin = true
+
+[icedos.applications.sunshine.settings]
+capture = "kms"
+sunshine_name = "Saloni Desktop"
+
+[icedos.applications.unshade]
+includeInIcedosGc = true
+
+[icedos.hardware.graphics.radeon]
+featureMask = "0xffffffff"
+
+[icedos.hardware.kernel]
+variant = "latest-lto-x86_64-v3"
+
+# [icedos.hardware.kernel.scx]
+# extraArgs = ["--performance"]
+
+[icedos.hardware.graphics.mesa]
+git = true
+
+[icedos.system]
+packages = [
+  "pcsx2",
+  "wl-freeze",
+]
