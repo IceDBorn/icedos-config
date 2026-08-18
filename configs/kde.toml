@@ -54,25 +54,21 @@ _launch = [ "Meta+P", "Meta+Π"]
 "show-on-mouse-pos" = []
 
 [icedos.desktop.kde.shortcuts.hotkeys.walker-applications]
-name = "Walker"
 command = "walker -m desktopapplications"
 keys = ["Meta+R", "Meta+Ρ"]
 logs.enabled = false
 
 [icedos.desktop.kde.shortcuts.hotkeys.walker-clipboard]
-name = "Walker Clipboard"
 command = "walker -m clipboard"
 keys = [ "Meta+V", "Meta+Ω" ]
 logs.enabled = false
 
-[icedos.desktop.kde.shortcuts.hotkeys.color-picker]
-name = "Color Picker"
-command = "qdbus org.kde.KWin /ColorPicker org.kde.kwin.ColorPicker.pick"
-keys = [ "Meta+C", "Meta+Ψ" ]
-logs.enabled = false
-
 [icedos.desktop.kde.shortcuts.hotkeys.walker-emojis]
-name = "Walker Emojis"
 command = "walker -m symbols"
 keys = [ "Meta+E", "Meta+Ε" ]
+logs.enabled = false
+
+[icedos.desktop.kde.shortcuts.hotkeys.wl-freeze]
+command = "wl-freeze -a"
+keys = ["Meta+U", "Meta+Θ"]
 logs.enabled = false

@@ -1,0 +1,57 @@
+[icedos.applications.prime-agent]
+defaultModel = "big-pickle"
+defaultProvider = "opencode"
+includeInIcedosGc = true
+sessionRetentionDays = 7
+
+builtinExtensions = [
+  "confirm-destructive",
+  "git-checkpoint",
+  "todo",
+]
+
+
+[icedos.applications.prime-agent.extensions]
+comment-rules = """
+/** Persistent minimal-comments rule, appended to the system prompt each turn. */
+
+import type { ExtensionAPI } from "@earendil-works/pi-coding-agent";
+
+const RULE = `
+CODE COMMENT POLICY (always):
+- Comments at most 2 lines, single line preferred.
+- No multi-line header blocks; no restating what code obviously does.
+- Comment only where non-obvious (tricky logic, constraints).
+- When editing existing code, trim new comments to the minimum needed.`;
+
+// Append the rule to the chained system prompt before each turn.
+export default function commentRules(pi: ExtensionAPI) {
+	pi.on("before_agent_start", (event) => {
+		return {
+			systemPrompt: `${event.systemPrompt}
+
+${RULE}`,
+		};
+	});
+}
+"""
+
+[icedos.applications.prime-agent.providers.opencode.modelOverrides.big-pickle]
+contextWindow = 95000
+
+[icedos.applications.prime-agent.providers.opencode-go.modelOverrides.deepseek-v4-pro]
+contextWindow = 400000
+
+[[icedos.applications.prime-agent.providers.opencode-go.models]]
+id = "glm-5.3-flash"
+name = "GLM-5.3-Flash"
+reasoning = true
+contextWindow = 400000
+maxTokens = 131072
+input = ["text", "image"]
+
+[icedos.applications.prime-agent.providers.opencode-go.models.cost]
+input = 0.075
+output = 0.25
+cacheRead = 0.015
+cacheWrite = 0

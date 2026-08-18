@@ -1,0 +1,7 @@
+[icedos.applications.shadps4-guest]
+# Local shadPS4 user id for the guest instance (users.json).
+userId = 1001
+# Bloodborne install dir.
+gameDir = "/home/ice/games/bloodborne/CUSA03173"
+# Per-instance shader cache (relative to $HOME) so both instances never race.
+cacheDir = ".cache/shadps4-joanna"

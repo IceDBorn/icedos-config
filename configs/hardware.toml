@@ -11,7 +11,8 @@ modules = [
   "radeon",
   "ryzen",
   "samba",
-  "scx",
+  # "scx",
+  "steam-wayland-overlay",
   "uinput",
   "upower",
   "wake-on-lan",
@@ -34,8 +35,8 @@ featureMask = "0xffffffff"
 [icedos.hardware.kernel]
 variant = "latest-lto-x86_64-v3"
 
-[icedos.hardware.kernel.scx]
-extraArgs = ["--performance"]
+# [icedos.hardware.kernel.scx]
+# extraArgs = ["--performance"]
 
 [icedos.hardware.graphics.mesa]
 git = true

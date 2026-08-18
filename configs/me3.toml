@@ -69,11 +69,11 @@ profileVersion = "v1"
 disable_arxan = true
 start_online = true
 natives = [
-  { name = "cl-server-redirector", path = "/mnt/games-ssd/games/nr/natives/cl_server_redirector.dll" },
+  { name = "cl-server-redirector", path = "/mnt/games-ssd/games/nr/packages/variations/output/ServerRedirector/cl_server_redirector.dll" },
+  { name = "custom_drop_fxrs", path = "/mnt/games-ssd/games/nr/packages/variations/output/dll/custom_drop_fxrs.dll", load_early = true },
   { name = "disable-chromatic-aberration", path = "/mnt/games-ssd/games/nr/natives/disable-chromatic-aberration.dll" },
   { name = "disable-sharpening", path = "/mnt/games-ssd/games/nr/natives/disable-sharpening.dll" },
   { name = "disable-vignette", path = "/mnt/games-ssd/games/nr/natives/disable-vignette.dll" },
-  { name = "increase-animation-distance", path = "/mnt/games-ssd/games/nr/natives/increase-animation-distance.dll" },
   { name = "seamless-coop", path = "/mnt/games-ssd/games/nr/natives/nrsc.dll", load_early = true },
   { name = "storm-control", path = "/mnt/games-ssd/games/nr/natives/storm-control.dll", load_early = true },
   { name = "timer", path = "/mnt/games-ssd/games/nr/natives/timer.dll" },
@@ -92,7 +92,6 @@ natives = [
   "disable-chromatic-aberration",
   "disable-sharpening",
   "disable-vignette",
-  "increase-animation-distance",
   # "seamless-coop",
   "timer",
   "ultrawide",
@@ -111,3 +110,4 @@ natives = ["storm-control"]
 name = "nr-variations"
 dependencies = ["nr-storm-control"]
 packages = ["variations"]
+natives = ["custom_drop_fxrs"]
