@@ -4,10 +4,14 @@ url = "github:icedos/desktop"
 
 [icedos.desktop]
 autologinUser = "ice"
-defaultBrowser = "helium.desktop"
-defaultEditor = "dev.zed.Zed.desktop"
 keyboardLayouts = ["us", "gr"]
 wallpaper = "/home/ice/Pictures/wallpaper.jpg"
+
+[icedos.desktop.applications.browser]
+name = "helium.desktop"
+
+[icedos.desktop.applications.editor]
+name = "dev.zed.Zed.desktop"
 
 [icedos.desktop.bookmarks]
 public = false
@@ -19,9 +23,19 @@ name = "Blanket"
 exec = "icedos pkgs run blanket"
 icon = "blanket"
 
+[[icedos.desktop.entries]]
+id = "powertop"
+name = "Powertop"
+exec = "sh -c \"printf 'layout tall\\nlaunch run0 btop\\nlaunch icedos pkgs run nvtopPackages.amd\\n' | kitty --session -\""
+icon = "terminal"
+
 [icedos.desktop.stylix]
-enable = true
-disabledTargets = ["console", "kmscon", "regreet"]
+disabledTargets = [
+  "console",
+  "kmscon",
+  "regreet",
+  "zed",
+]
 
 [icedos.desktop.windows]
 maximizeButton = false
