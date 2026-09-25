@@ -9,7 +9,7 @@
       url = "github:nix-community/home-manager/4900baf1e219645e4a2acba35723852b2091bc20";
     };
     icedos-config = {
-      url = "path:/nix/store/zp5vb5nrx9b6z8imvkpmd8983zn74h2h-icedos-config";
+      url = "path:/nix/store/dp3hb2qh5xfm5n3hch25ixyv8zhxabm7-icedos-config";
     };
     icedos-core = {
       follows = "icedos-config/icedos";

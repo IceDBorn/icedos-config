@@ -83,6 +83,29 @@ ${RULE}`,
 }
 """
 
+no-commit = """
+/** Persistent git commit rule, appended to the system prompt each turn. */
+
+import type { ExtensionAPI } from "@earendil-works/pi-coding-agent";
+
+const RULE = `
+GIT COMMITS (always):
+- Never run git commit unless the user explicitly asks you to commit.
+- Stage changes with git add when a task is done, then stop and report what is staged.
+- A commit request covers only that one commit, not later changes.`;
+
+// Append the rule to the chained system prompt before each turn.
+export default function noCommit(pi: ExtensionAPI) {
+	pi.on("before_agent_start", (event) => {
+		return {
+			systemPrompt: `${event.systemPrompt}
+
+${RULE}`,
+		};
+	});
+}
+"""
+
 local-images = """
 /** Persistent local-vision rule, appended to the system prompt each turn. */
 
@@ -137,7 +160,7 @@ ${RULE}`,
 free-review = '''
 ---
 name: free-review
-description: Review your changes with the code review skill in a review-until-clean loop, using only free models as subagents, preferring opencode, then ollama, then openrouter, then the local llamacpp model. Use when the user asks for a free review or asks to review until no findings remain.
+description: Review your changes with the code review skill in a review-until-clean loop, using only free models as subagents, preferring openrouter, then ollama, then the local llamacpp model, then opencode. Use when the user asks for a free review or asks to review until no findings remain.
 ---
 
 # Free review
@@ -153,15 +176,15 @@ Read the code review skill, then review your changes with it in its review-until
 Do not use rlm.find_models() for this. It returns at most 20 matches, has no price field, and its free-text search misses most free models. List the models from the shell instead:
 
 ```bash
-prime-agent model list 2>&1 | awk '$1 == "opencode" || $1 == "ollama" || $1 == "openrouter" || $1 == "llamacpp"'
+prime-agent model list 2>&1 | awk '$1 == "openrouter" || $1 == "ollama" || $1 == "llamacpp" || $1 == "opencode"'
 ```
 
 Pass each one to rlm.spawn as model="<provider>/<model id>", exactly as listed.
 
-1. opencode: opencode/big-pickle, plus opencode models whose id ends in "-free".
+1. openrouter: models whose id ends in ":free". Skip openrouter/free, which is a router, not a model. The account allows only 10 free requests a day, and each subagent turn is one request.
 2. ollama: only gemma4:31b, gpt-oss:120b, gpt-oss:20b, nemotron-3-nano:30b, nemotron-3-super and nemotron-3-ultra. The free plan allows one request at a time, so run at most one ollama subagent at a time.
-3. openrouter: models whose id ends in ":free". Skip openrouter/free, which is a router, not a model. The account allows only 10 free requests a day, and each subagent turn is one request, so spawn openrouter models only when opencode and ollama cannot take the task.
-4. llamacpp: llamacpp/Qwen3.8-27B-GSQ-RCO-IQ3_XXS+MTP, only when the GPU check passes.
+3. llamacpp: llamacpp/Qwen3.8-27B-GSQ-RCO-IQ3_XXS+MTP, only when the GPU check passes. Never run more than one llamacpp subagent at once. Wait for the running one to finish before you spawn the next.
+4. opencode: opencode/big-pickle, plus opencode models whose id ends in "-free". It comes last because the vpn-rotate extension rotates the VPN and retries on every opencode rate limit, so an opencode model never fails over to another provider.
 
 If ollama or openrouter returns a quota, plan or rate-limit error, stop using that provider for the rest of the review.
 
