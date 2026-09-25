@@ -38,13 +38,19 @@ url = "https://mcp.context7.com/mcp"
 command = "nix-shell"
 args = [
   "-p",
-  "python313.withPackages (p: [p.pygobject3 p.dbus-python p.pillow])",
+  "python313",
   "at-spi2-core",
   "gobject-introspection",
   "libei",
+  "cairo",
+  "dbus",
+  "pkg-config",
+  "meson",
+  "ninja",
+  "uv",
   "wl-clipboard",
   "wtype",
   "wayland-utils",
   "--run",
-  "set -e; dir=\"$HOME/.local/share/kwin-mcp\"; export LD_LIBRARY_PATH=\"$(nix-build '<nixpkgs>' -A libei --no-out-link)/lib${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}\"; if ! \"$dir/venv/bin/python\" -c 'import kwin_mcp, gi' 2>/dev/null; then rm -rf \"$dir/venv\"; python -m venv --system-site-packages \"$dir/venv\" >&2; \"$dir/venv/bin/pip\" install -q 'mcp>=2,<3' >&2; \"$dir/venv/bin/pip\" install -q --no-deps 'git+https://github.com/VibeProgramm/kwin-mcp' >&2; fi; exec \"$dir/venv/bin/kwin-mcp\"",
+  "for d in $NIX_LDFLAGS; do case $d in -L*) LD_LIBRARY_PATH=\"${LD_LIBRARY_PATH}:${d#-L}\";; esac; done; export LD_LIBRARY_PATH; exec uvx --python \"$(command -v python3)\" --from git+https://github.com/isac322/kwin-mcp kwin-mcp",
 ]

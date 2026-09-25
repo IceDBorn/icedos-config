@@ -1,0 +1,21 @@
+[[icedos.repositories]]
+url = "github:icedos/apps"
+modules = [
+  "bb-launcher",
+  "shadps4",
+]
+
+[icedos.applications.shadps4]
+prerelease = true
+shadnet = true
+
+[[icedos.applications.sunshine-headless.apps]]
+name = "Bloodborne"
+command = [
+  "proton-launch",
+  "--no-mangohud",
+  "shadPS4QtLauncher",
+  "-g",
+  "CUSA03173",
+  "-d"
+]
