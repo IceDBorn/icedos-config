@@ -23,12 +23,6 @@ name = "Blanket"
 exec = "icedos pkgs run blanket"
 icon = "blanket"
 
-[[icedos.desktop.entries]]
-id = "powertop"
-name = "Powertop"
-exec = "sh -c \"printf 'layout tall\\nlaunch run0 btop\\nlaunch icedos pkgs run nvtopPackages.amd\\n' | kitty --session -\""
-icon = "terminal"
-
 [icedos.desktop.stylix]
 disabledTargets = [
   "console",

@@ -1,0 +1,14 @@
+[[icedos.repositories]]
+url = "github:icedos/apps"
+modules = [
+  "protonvpn-cli",
+]
+
+[icedos.applications.protonvpn-cli.connect]
+country = "BG"
+
+[icedos.applications.protonvpn-cli.kde]
+widget = true
+
+[icedos.applications.protonvpn-cli.settings]
+killSwitch = false

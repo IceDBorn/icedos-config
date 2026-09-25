@@ -8,7 +8,6 @@ modules = [
   "celluloid",
   "nautilus",
   "ncdu",
-  "protonvpn-cli",
   "sd-inhibitor",
   "spotube",
   "tailscale",
@@ -20,15 +19,6 @@ diskExclusions = ["/boot", "/home"]
 
 [icedos.applications.kitty]
 hideDecorations = true
-
-[icedos.applications.protonvpn-cli.connect]
-country = "BG"
-
-[icedos.applications.protonvpn-cli.desktop-entry]
-countries = ["BG", "DE", "GR", "HU", "RO"]
-
-[icedos.applications.protonvpn-cli.settings]
-killSwitch = false
 
 [icedos.applications.sd-inhibitor.users.ice.watchers.ports]
 inboundPorts = [22, 48100, 48200]

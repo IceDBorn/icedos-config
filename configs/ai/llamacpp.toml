@@ -5,7 +5,7 @@ modules = ["llamacpp"]
 [icedos.applications.llamacpp]
 patches = [
   { url = "https://github.com/ggml-org/llama.cpp/pull/25592.diff", hash = "sha256-F3xksk8w9KjVjQIP7SoTJxmeAvfwuHtDfua/e3W0GCM=" },
-  { url = "https://github.com/ggml-org/llama.cpp/pull/27694.diff", hash = "sha256-olD675PE7BmTz2NfQj0xwzY017WjUhF7kpyTRMz1UeQ=" },
+  { url = "https://github.com/ggml-org/llama.cpp/pull/27694.diff", hash = "sha256-chWMdwcmIlzEIFgrELbpMwBmb1fpoVGSYEUbkhzc2SQ=" },
   { url = "https://github.com/ggml-org/llama.cpp/pull/28507.diff", hash = "sha256-w2vp8CdYk7ksf8XiaW8WEdpcbzRbXV6JJCOJXXYWTk8=" },
 ]
 priorityUsers = ["ice"]
@@ -26,7 +26,7 @@ path = "/home/ice/.local/share/llamacpp/models/mmproj-Qwen3.8-27B-BF16.gguf"
 
 [icedos.applications.llamacpp.settings.model]
 contextSize = 104858
-path = "/home/ice/.local/share/llamacpp/models/Qwen3.8-27B-GSQ-RCO-IQ3_XXS+MTP.gguf"
+path = "/home/ice/.local/share/llamacpp/models/RVN-Qwen3.8-27B-Heretic-GSQ-RCO-IQ3_XXS-mtp.gguf"
 
 [icedos.applications.llamacpp.settings.model.thinking-level-map]
 minimal = "low"

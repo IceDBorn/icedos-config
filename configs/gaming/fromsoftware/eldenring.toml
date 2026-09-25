@@ -1,0 +1,70 @@
+[[icedos.repositories]]
+url = "github:icedos/apps"
+modules = [
+  "me3",
+]
+
+[icedos.applications.me3.games.eldenring]
+profileVersion = "v1"
+disable_arxan = true
+start_online = true
+natives = [
+  { name = "convergence-alt-saves", path = "/mnt/games-ssd/games/er/packages/convergence/dll/eldenring_alt_saves.dll" },
+  { name = "convergence-erdtools", path = "/mnt/games-ssd/games/er/packages/convergence/dll/ErdTools.dll" },
+  { name = "convergence-erdyes", path = "/mnt/games-ssd/games/er/packages/convergence/dll/erdyes.dll" },
+  { name = "convergence-scripts-exposer", path = "/mnt/games-ssd/games/er/packages/convergence/dll/Scripts-Data-Exposer-FS.dll" },
+  { name = "convergence-transmogrify", path = "/mnt/games-ssd/games/er/packages/convergence/dll/ertransmogrify.dll" },
+  { name = "convergence-unlock-wwise-states", path = "/mnt/games-ssd/games/er/packages/convergence/dll/unlock_wwise_states_er.dll" },
+  { name = "disable-sharpening", path = "/mnt/games-ssd/games/er/natives/disable-sharpening.dll" },
+  { name = "increase-animation-distance", path = "/mnt/games-ssd/games/er/natives/increase-animation-distance.dll" },
+  { name = "nightreign-movement", path = "/mnt/games-ssd/games/er/packages/nightreign-movement/dll/NightreignMovement.dll", initializer = { function = "NrmInitialize" } },
+  { name = "practice-tool", path = "/mnt/games-ssd/games/er/natives/er-practice-tool.dll" },
+  { name = "remove-chromatic-aberration", path = "/mnt/games-ssd/games/er/natives/remove-chromatic-aberration.dll" },
+  { name = "remove-vignette", path = "/mnt/games-ssd/games/er/natives/remove-vignette.dll" },
+  { name = "seamless-coop", path = "/mnt/games-ssd/games/er/natives/seamless-coop/ersc.dll" },
+  { name = "ultrawide", path = "/mnt/games-ssd/games/er/natives/ultrawide.dll" },
+  { name = "unlock-fps", path = "/mnt/games-ssd/games/er/natives/unlock-fps.dll" },
+]
+packages = [
+  { id = "convergence", path = "/mnt/games-ssd/games/er/packages/convergence/mod" },
+  { id = "fast-torrent", path = "/mnt/games-ssd/games/er/packages/fast-torrent" },
+  { id = "nightreign-movement", path = "/mnt/games-ssd/games/er/packages/nightreign-movement" },
+]
+
+[[icedos.applications.me3.games.eldenring.profiles]]
+name = "er"
+natives = [
+  "disable-sharpening",
+  "increase-animation-distance",
+  "remove-chromatic-aberration",
+  "remove-vignette",
+  # "seamless-coop",
+  "ultrawide",
+  "unlock-fps",
+]
+
+[[icedos.applications.me3.games.eldenring.profiles]]
+name = "er-nr"
+dependencies = ["er"]
+natives = [
+  "nightreign-movement",
+  # "practice-tool",
+]
+packages = [
+  "fast-torrent",
+  "nightreign-movement",
+]
+
+[[icedos.applications.me3.games.eldenring.profiles]]
+name = "er-convergence"
+dependencies = ["er"]
+natives = [
+  "convergence-erdtools",
+  "convergence-erdyes",
+  "convergence-scripts-exposer",
+  "convergence-transmogrify",
+  "convergence-unlock-wwise-states",
+]
+packages = [
+  "convergence",
+]

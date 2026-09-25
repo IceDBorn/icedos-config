@@ -5,8 +5,10 @@ fetchOptionalDependencies = true
 modules = [
   "dynamic-workspaces",
   "foreground-booster",
+  "lumen",
   "move-to-desktop-follow",
   "polonium",
+  "wattmeter",
   "window-borders",
 ]
 
@@ -25,20 +27,25 @@ switchingPolicy = "window"
 
 [icedos.desktop.kde.panel]
 height = 32
-location = "top" # top, bottom, left, right, floating
+location = "top"
 widgets = [
   "org.kde.plasma.pager",
   "org.kde.plasma.panelspacer",
   "org.kde.plasma.icontasks",
   "org.kde.plasma.panelspacer",
   "org.kde.plasma.marginsseparator",
+  "org.icedos.wattmeter",
   "org.kde.plasma.systemtray",
   "org.kde.plasma.digitalclock",
   "org.kde.plasma.lock_logout",
 ]
 
 [icedos.desktop.kde.panel.system-tray]
-disabledApplets = ["org.kde.plasma.weather"]
+disabledApplets = [
+  "org.icedos.wattmeter",
+  "org.kde.plasma.brightness",
+  "org.kde.plasma.weather"
+]
 
 [[icedos.desktop.kde.screen-edges]]
 position = "topLeft"
@@ -72,3 +79,13 @@ logs.enabled = false
 command = "wl-freeze -a"
 keys = ["Meta+U", "Meta+Θ"]
 logs.enabled = false
+
+[icedos.desktop.kde.lumen]
+latitude = 44.43
+longitude = 26.10
+
+[icedos.desktop.kde.wattmeter]
+price = 0.144
+surcharge = 0.0389
+vat = 6
+gpuIdleWatts = 38

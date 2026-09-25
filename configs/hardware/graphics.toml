@@ -1,0 +1,12 @@
+[[icedos.repositories]]
+url = "github:icedos/hardware"
+modules = [
+  "radeon",
+]
+
+[icedos.hardware.graphics.mesa]
+git = true
+
+[icedos.hardware.graphics.radeon]
+featureMask = "0xffffffff"
+rocm = true

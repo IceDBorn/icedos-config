@@ -2,10 +2,12 @@
 url = "github:icedos/apps"
 modules = [
   "gamescope",
+  "kytyps5",
   "lact",
   "mangohud",
   "prefixer",
   "proton-launch",
+  "steam-cloud-file-manager",
   "steam-headless",
   "unshade",
 ]
@@ -50,17 +52,11 @@ sunshine_name = "Saloni Desktop"
 [icedos.applications.unshade]
 includeInIcedosGc = true
 
-[icedos.hardware.graphics.radeon]
-featureMask = "0xffffffff"
-
 [icedos.hardware.kernel]
 variant = "latest-lto-x86_64-v3"
 
 [icedos.hardware.kernel.scx]
 extraArgs = ["--performance"]
-
-[icedos.hardware.graphics.mesa]
-git = true
 
 [icedos.system]
 packages = [
