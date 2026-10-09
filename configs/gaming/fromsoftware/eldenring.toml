@@ -1,14 +1,15 @@
 [[icedos.repositories]]
-url = "github:icedos/apps"
+url = "github:icedos/gaming"
 modules = [
   "me3",
 ]
 
-[icedos.applications.me3.games.eldenring]
+[icedos.gaming.me3.games.eldenring]
 profileVersion = "v1"
 disable_arxan = true
 start_online = true
 natives = [
+  { name = "affinity-fix", path = "/mnt/games-ssd/games/er/natives/affinity-fix.dll", load_early = true },
   { name = "convergence-alt-saves", path = "/mnt/games-ssd/games/er/packages/convergence/dll/eldenring_alt_saves.dll" },
   { name = "convergence-erdtools", path = "/mnt/games-ssd/games/er/packages/convergence/dll/ErdTools.dll" },
   { name = "convergence-erdyes", path = "/mnt/games-ssd/games/er/packages/convergence/dll/erdyes.dll" },
@@ -31,9 +32,10 @@ packages = [
   { id = "nightreign-movement", path = "/mnt/games-ssd/games/er/packages/nightreign-movement" },
 ]
 
-[[icedos.applications.me3.games.eldenring.profiles]]
+[[icedos.gaming.me3.games.eldenring.profiles]]
 name = "er"
 natives = [
+  "affinity-fix",
   "disable-sharpening",
   "increase-animation-distance",
   "remove-chromatic-aberration",
@@ -43,7 +45,7 @@ natives = [
   "unlock-fps",
 ]
 
-[[icedos.applications.me3.games.eldenring.profiles]]
+[[icedos.gaming.me3.games.eldenring.profiles]]
 name = "er-nr"
 dependencies = ["er"]
 natives = [
@@ -55,7 +57,7 @@ packages = [
   "nightreign-movement",
 ]
 
-[[icedos.applications.me3.games.eldenring.profiles]]
+[[icedos.gaming.me3.games.eldenring.profiles]]
 name = "er-convergence"
 dependencies = ["er"]
 natives = [
