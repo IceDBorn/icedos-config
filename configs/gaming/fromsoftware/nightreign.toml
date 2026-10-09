@@ -17,6 +17,7 @@ natives = [
   { name = "disable-chromatic-aberration", path = "/mnt/games-ssd/games/nr/packages/variations/output/dll/DisableChromaticAberration.dll", load_early = true },
   { name = "disable-sharpening", path = "/mnt/games-ssd/games/nr/packages/variations/output/dll/DisableSharpening.dll" },
   { name = "disable-vignette", path = "/mnt/games-ssd/games/nr/packages/variations/output/dll/DisableVignette.dll", load_early = true },
+  { name = "helen-mimic", path = "/mnt/games-ssd/games/nr/packages/variations/output/dll/HelenMimic.dll", load_early = true },
   { name = "nrallinone", path = "/mnt/games-ssd/games/nr/packages/variations/output/dll/target/release/nrallinone.dll", load_early = true },
   { name = "timer", path = "/mnt/games-ssd/games/nr/packages/variations/output/dll/StormTimer.dll" },
   { name = "ultrawide", path = "/mnt/games-ssd/games/nr/packages/variations/output/dll/UltrawideFix.dll" },
@@ -47,6 +48,7 @@ packages = ["variations"]
 natives = [
   "chance-setter",
   "custom_drop_fxrs",
+  "helen-mimic",
   "nrallinone",
   "unlock_wwise_states_nr"
 ]

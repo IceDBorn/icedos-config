@@ -1,8 +1,8 @@
 [[icedos.repositories]]
-url = "github:icedos/apps"
+url = "github:icedos/ai-tools"
 modules = ["llamacpp"]
 
-[icedos.applications.llamacpp]
+[icedos.ai-tools.llamacpp]
 patches = [
   { url = "https://github.com/ggml-org/llama.cpp/pull/25592.diff", hash = "sha256-F3xksk8w9KjVjQIP7SoTJxmeAvfwuHtDfua/e3W0GCM=" },
   { url = "https://github.com/ggml-org/llama.cpp/pull/27694.diff", hash = "sha256-chWMdwcmIlzEIFgrELbpMwBmb1fpoVGSYEUbkhzc2SQ=" },
@@ -10,34 +10,34 @@ patches = [
 ]
 priorityUsers = ["ice"]
 
-[icedos.applications.llamacpp.lifecycle]
+[icedos.ai-tools.llamacpp.lifecycle]
 idle = 120
 
-[icedos.applications.llamacpp.settings]
+[icedos.ai-tools.llamacpp.settings]
 flashAttn = true
 
-[icedos.applications.llamacpp.settings.cache]
+[icedos.ai-tools.llamacpp.settings.cache]
 typeK = "q8_0"
 typeV = "q8_0"
 
-[icedos.applications.llamacpp.settings.mmproj]
+[icedos.ai-tools.llamacpp.settings.mmproj]
 offload = false
 path = "/home/ice/.local/share/llamacpp/models/mmproj-Qwen3.8-27B-BF16.gguf"
 
-[icedos.applications.llamacpp.settings.model]
+[icedos.ai-tools.llamacpp.settings.model]
 contextSize = 104858
 path = "/home/ice/.local/share/llamacpp/models/RVN-Qwen3.8-27B-Heretic-GSQ-RCO-IQ3_XXS-mtp.gguf"
 
-[icedos.applications.llamacpp.settings.model.thinking-level-map]
+[icedos.ai-tools.llamacpp.settings.model.thinking-level-map]
 minimal = "low"
 high = "xhigh"
 
-[icedos.applications.llamacpp.settings.server]
+[icedos.ai-tools.llamacpp.settings.server]
 parallel = 1
 
-[icedos.applications.llamacpp.settings.spec]
+[icedos.ai-tools.llamacpp.settings.spec]
 type = "ngram-mod,draft-mtp"
 
-[icedos.applications.llamacpp.settings.spec.draft]
+[icedos.ai-tools.llamacpp.settings.spec.draft]
 nMax = 2
 sampling = "probabilistic"

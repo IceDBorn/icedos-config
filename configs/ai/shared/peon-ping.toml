@@ -1,11 +1,11 @@
 [[icedos.repositories]]
-url = "github:icedos/apps"
+url = "github:icedos/ai-tools"
 modules = ["peon-ping"]
 
-[icedos.applications.peon-ping.users.ice]
+[icedos.ai-tools.peon-ping.users.ice]
 defaultPack = "ds1-siegmeyer"
 
-[[icedos.applications.peon-ping.users.ice.customPacks]]
+[[icedos.ai-tools.peon-ping.users.ice.customPacks]]
 name = "ds1-siegmeyer"
 owner = "jmfiebak"
 repo = "openpeon-siegmeyer-sound-pack"

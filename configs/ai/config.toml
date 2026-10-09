@@ -1,0 +1,14 @@
+[[icedos.repositories]]
+url = "github:icedos/ai-tools"
+overrideUrl = "path:/home/ice/Projects/icedos/ai-tools"
+modules = ["alimit", "code-intelligence"]
+
+[icedos.system]
+packages = [
+  "clang-tools",
+  "lua-language-server",
+  "nixd",
+  "pyright",
+  "rust-analyzer",
+  "typescript-language-server",
+]

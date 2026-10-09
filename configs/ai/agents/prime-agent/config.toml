@@ -1,167 +1,64 @@
 [[icedos.repositories]]
-url = "github:icedos/apps"
+url = "github:icedos/ai-tools"
 modules = ["prime-agent"]
 
-[icedos.applications.prime-agent]
+[icedos.ai-tools.prime-agent]
 includeInIcedosGc = true
 sessionRetentionDays = 7
 
-[icedos.applications.prime-agent.default]
+[icedos.ai-tools.prime-agent.default]
 model = "big-pickle"
 provider = "opencode"
 
-[icedos.applications.prime-agent.settings]
+[icedos.ai-tools.prime-agent.settings]
 imageModel = "llamacpp/RVN-Qwen3.8-27B-Heretic-GSQ-RCO-IQ3_XXS-mtp"
 
-[icedos.applications.prime-agent.settings.providers.opencode.modelOverrides.big-pickle]
+[icedos.ai-tools.prime-agent.settings.providers.opencode.modelOverrides.big-pickle]
 contextWindow = 210000
 
-[icedos.applications.prime-agent.extensions]
+[icedos.ai-tools.prime-agent.extensions]
 builtin = [
   "confirm-destructive",
   "git-checkpoint",
   "todo",
 ]
 
-[icedos.applications.prime-agent.extensions.context-language-models]
+[icedos.ai-tools.prime-agent.extensions.context-language-models]
 enable = true
 
-[icedos.applications.prime-agent.extensions.context-window-cap]
+[icedos.ai-tools.prime-agent.extensions.context-window-cap]
 enable = true
 
-[icedos.applications.prime-agent.extensions.meters.power]
+[icedos.ai-tools.prime-agent.extensions.meters.power]
 enable = true
 currency = "€"
 idleWatts = 38
 rateKwh = 0.1939
 windows = ["1m", "1h", "1d", "1w", "1M"]
 
-[icedos.applications.prime-agent.extensions.prompt-suggestions]
+[icedos.ai-tools.prime-agent.extensions.prompt-suggestions]
 enable = true
 
-[icedos.applications.prime-agent.extensions.inline]
-comment-rules = """
-/** Persistent minimal-comments rule, appended to the system prompt each turn. */
-
-import type { ExtensionAPI } from "@earendil-works/pi-coding-agent";
-
-const RULE = `
-CODE COMMENT POLICY (always):
-- Comments at most 2 lines, single line preferred.
-- No multi-line header blocks; no restating what code obviously does.
-- Comment only where non-obvious (tricky logic, constraints).
-- When editing existing code, trim new comments to the minimum needed.`;
-
-// Append the rule to the chained system prompt before each turn.
-export default function commentRules(pi: ExtensionAPI) {
-	pi.on("before_agent_start", (event) => {
-		return {
-			systemPrompt: `${event.systemPrompt}
-
-${RULE}`,
-		};
-	});
-}
-"""
-
-clean-leftovers = """
-/** Persistent leftover-cleanup rule, appended to the system prompt each turn. */
-
-import type { ExtensionAPI } from "@earendil-works/pi-coding-agent";
-
-const RULE = `
-LEFTOVER CLEANUP (always):
-- Before finishing a task, delete every leftover you created: temp files, scratch scripts, state or round files, logs, test outputs, backup copies.
-- Stop background processes, dev servers and subagent sessions you started.
-- Remove debug prints and throwaway code you added.
-- Keep only what the user asked for. If unsure whether a file is wanted, ask instead of leaving it.`;
-
-// Append the rule to the chained system prompt before each turn.
-export default function cleanLeftovers(pi: ExtensionAPI) {
-	pi.on("before_agent_start", (event) => {
-		return {
-			systemPrompt: `${event.systemPrompt}
-
-${RULE}`,
-		};
-	});
-}
-"""
-
-no-commit = """
-/** Persistent git commit rule, appended to the system prompt each turn. */
-
-import type { ExtensionAPI } from "@earendil-works/pi-coding-agent";
-
-const RULE = `
-GIT COMMITS (always):
-- Never run git commit unless the user explicitly asks you to commit.
-- Stage changes with git add when a task is done, then stop and report what is staged.
-- A commit request covers only that one commit, not later changes.`;
-
-// Append the rule to the chained system prompt before each turn.
-export default function noCommit(pi: ExtensionAPI) {
-	pi.on("before_agent_start", (event) => {
-		return {
-			systemPrompt: `${event.systemPrompt}
-
-${RULE}`,
-		};
-	});
-}
-"""
-
-local-images = """
-/** Persistent local-vision rule, appended to the system prompt each turn. */
-
-import type { ExtensionAPI } from "@earendil-works/pi-coding-agent";
-
-const RULE = `
+[icedos.ai-tools.prime-agent.extensions.rules]
+local-images = '''
 IMAGE FILES (always):
 - Pasted images route to the image model automatically. For an image file on disk, attach_image refuses on a text-only model, so spawn a vision child instead:
   child = await rlm.spawn("Run: print(await attach_image('/abs/path.png')). Then <the user's question>. Reply with the full answer.", name="local-vision", model="llamacpp/RVN-Qwen3.8-27B-Heretic-GSQ-RCO-IQ3_XXS-mtp")
   result = (await rlm.collect(child, timeout_ms=600000))[0]
-- If status is not "done", collect again instead of spawning a second child (llama-server can take a minute to load). Relay the answer, then await rlm.delete_subagent(child).`;
+- If status is not "done", collect again instead of spawning a second child (llama-server can take a minute to load). Relay the answer, then await rlm.delete_subagent(child).
+'''
 
-// Append the rule to the chained system prompt before each turn.
-export default function localImages(pi: ExtensionAPI) {
-	pi.on("before_agent_start", (event) => {
-		return {
-			systemPrompt: `${event.systemPrompt}
-
-${RULE}`,
-		};
-	});
-}
-"""
-
-local-gpu-guard = """
-/** Persistent GPU-contention rule for the local model, appended to the system prompt each turn. */
-
-import type { ExtensionAPI } from "@earendil-works/pi-coding-agent";
-
-const RULE = `
+local-gpu-guard = '''
 LOCAL MODEL GPU CHECK (always):
 - Use the local llamacpp model only when the GPU is free. Check right before every local model call, including subagents.
 - The card number changes between boots and machines, so never hardcode it. List AMD cards with:
   for d in /sys/class/drm/card[0-9]*/device; do [ -r $d/gpu_busy_percent ] && echo "$d busy=$(cat $d/gpu_busy_percent) used=$(cat $d/mem_info_vram_used) total=$(cat $d/mem_info_vram_total)"; done; pgrep -x llama-server
 - Judge the card with the largest VRAM total. If none is listed, use: nvidia-smi --query-gpu=utilization.gpu,memory.used,memory.total --format=csv
 - The GPU is in use if busy is above 30%, or if llama-server is not running and VRAM used is above 4 GiB (4294967296 bytes).
-- If the GPU is in use, do not start or call the local model. Use a cloud model instead and tell the user why.`;
+- If the GPU is in use, do not start or call the local model. Use a cloud model instead and tell the user why.
+'''
 
-// Append the rule to the chained system prompt before each turn.
-export default function localGpuGuard(pi: ExtensionAPI) {
-	pi.on("before_agent_start", (event) => {
-		return {
-			systemPrompt: `${event.systemPrompt}
-
-${RULE}`,
-		};
-	});
-}
-"""
-
-[icedos.applications.prime-agent.skills.extraBuiltin]
+[icedos.ai-tools.prime-agent.skills.extraBuiltin]
 free-review = '''
 ---
 name: free-review

@@ -1,0 +1,115 @@
+[[icedos.repositories]]
+url = "github:icedos/ai-tools"
+modules = ["mcp-server"]
+
+[home-manager.users.ice.programs.mcp]
+enable = true
+
+[home-manager.users.ice.programs.mcp.servers.basic-memory]
+command = "nix-shell"
+args = [
+  "-p",
+  "uv",
+  "python313",
+  "stdenv.cc.cc.lib",
+  "gcc",
+  "--run",
+  "export BASIC_MEMORY_CONFIG_DIR=\"$HOME/.config/basic-memory\"; export BASIC_MEMORY_HOME=\"$HOME/.local/share/basic-memory\"; export BASIC_MEMORY_FORCE_LOCAL=true; export LD_LIBRARY_PATH=$(dirname $(gcc -print-file-name=libstdc++.so.6)):$LD_LIBRARY_PATH; uvx --python 3.13 basic-memory mcp",
+]
+
+[home-manager.users.ice.programs.mcp.servers.icedos]
+command = "icedos"
+args = ["mcp", "serve"]
+timeout = 3600000
+
+[home-manager.users.ice.programs.mcp.servers.nixos]
+command = "nix-shell"
+args = ["-p", "mcp-nixos", "--run", "mcp-nixos"]
+
+[home-manager.users.ice.programs.mcp.servers.chrome-devtools]
+command = "nix-shell"
+args = [
+  "-p",
+  "nodejs",
+  "--run",
+  "npx -y chrome-devtools-mcp@latest --executable-path=/run/current-system/sw/bin/helium --isolated=true --no-usage-statistics",
+]
+timeout = 600000
+
+[home-manager.users.ice.programs.mcp.servers.context7]
+url = "https://mcp.context7.com/mcp"
+
+[home-manager.users.ice.programs.mcp.servers.kwin-mcp]
+command = "nix-shell"
+args = [
+  "-p",
+  "python313",
+  "at-spi2-core",
+  "gobject-introspection",
+  "libei",
+  "cairo",
+  "dbus",
+  "pkg-config",
+  "meson",
+  "ninja",
+  "uv",
+  "wl-clipboard",
+  "wtype",
+  "wayland-utils",
+  "--run",
+  "for d in $NIX_LDFLAGS; do case $d in -L*) LD_LIBRARY_PATH=\"${LD_LIBRARY_PATH}:${d#-L}\";; esac; done; export LD_LIBRARY_PATH; exec uvx --python \"$(command -v python3)\" --from git+https://github.com/isac322/kwin-mcp kwin-mcp",
+]
+
+[home-manager.users.ice.programs.mcp.servers.signal-mcp]
+command = "nix-shell"
+args = [
+  "-p",
+  "python313",
+  "signal-cli",
+  "uv",
+  "--run",
+  "if ! (exec 3<>/dev/tcp/127.0.0.1/7583) 2>/dev/null; then signal-cli -a \"+306989910562\" daemon --tcp 127.0.0.1:7583 --receive-mode on-start --no-receive-stdout & for i in $(seq 1 50); do if (exec 3<>/dev/tcp/127.0.0.1/7583) 2>/dev/null; then exec 3>&-; break; fi; sleep 0.2; done; else exec 3>&-; fi; exec uvx --from git+https://github.com/joestump/signal-mcp signal-mcp --operator \"+306989910562\" --trusted-recipient \"+306989910562\" --trusted-recipient \"Level 5 runs incoming\" --trusted-sender \"+306989910562\" --transport stdio",
+]
+
+[icedos.ai-tools.mcp-server.skills]
+icedos-mcp = """
+---
+name: icedos-mcp
+description: Use ALWAYS when working on IceDOS — prefer mcp__icedos__* and mcp__nixos__* tools over manual file reads, grep, or web searches for IceDOS/NixOS questions.
+---
+
+# IceDOS MCP-First Behavior
+
+## Mandatory Tool Order for IceDOS Work
+
+1. **IceDOS MCP** (`mcp__icedos__*`) — config, options, modules, repo source, system
+2. **NixOS MCP** (`mcp__nixos__*`) — nixpkgs packages, NixOS/home-manager options
+3. **Basic Memory** — check/save knowledge
+4. **Search tools** — `websearch` only when MCPs can't answer
+5. **File tools** — `Read`/`Grep`/`Glob` only for non-IceDOS files
+6. **Bash** — absolute last resort
+
+## What Each MCP Covers
+
+### IceDOS MCP
+- **Config** — `get_config`, `get_config_value`, `set_config_value`, `delete_config_value`, `list_repositories`, `enable_module`, `disable_module`. Never hand-edit `config.toml`.
+- **Options** — `search_options`, `get_option` for `icedos.*` options.
+- **Modules** — `list_modules`, `search_modules`, `get_module`, `module_graph`.
+- **Repo source** — `list_repo_tree` + `read_repo_file` for any icedos repo (local or online). Use instead of manual file reads.
+- **System** — `doctor`, `rebuild`, `rollback`, `get_generations_tool`, `diff_generations`, `list_inputs`, `list_packages`, `run_package`.
+
+### NixOS MCP
+- Non-`icedos.*` options (nixpkgs, NixOS, home-manager).
+- Package search, info, version history.
+- Flake inputs, binary cache, NixOS wiki.
+
+## When NOT to Use MCPs
+
+- Editing a file in place (use `Edit` tool)
+- Reading non-IceDOS files (use `Read` tool)
+- Git operations (use `Bash`)
+
+## Key Rule
+
+**The MCPs are the source of truth.** Never guess, never hand-parse TOML, never grep for option names — ask the MCP.
+"""

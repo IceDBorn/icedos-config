@@ -5,11 +5,17 @@ modules = ["zed"]
 [icedos.applications.zed]
 vim = true
 
+[icedos.applications.zed.agentBridge]
+enable = true
+
 [icedos.applications.zed.copySelectionLocation]
 enable = true
 
 [icedos.applications.zed.font]
 size = 12
+
+[icedos.applications.zed.lazygit]
+enable = true
 
 [icedos.applications.zed.lsp.taplo.settings.formatter]
 alignComments = false

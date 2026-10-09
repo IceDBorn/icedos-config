@@ -1,4 +1,4 @@
-[icedos.applications.prime-agent.extensions.inline]
+[icedos.ai-tools.prime-agent.extensions.inline]
 vpn-rotate = '''/**
  * vpn-rotate: rotate the ProtonVPN egress IP when the model provider
  * rate-limits (HTTP 404 or 429). Tracks VPN state, detects disconnects,

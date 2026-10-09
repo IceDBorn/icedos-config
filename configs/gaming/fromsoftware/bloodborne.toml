@@ -2,6 +2,7 @@
 url = "github:icedos/apps"
 modules = [
   "bb-launcher",
+  "bbhost",
   "shadps4",
 ]
 
