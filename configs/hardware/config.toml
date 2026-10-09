@@ -18,9 +18,6 @@ swapDevices = ["/swap/swapfile"]
 [icedos.hardware.bluetooth]
 controllerMode = "dual"
 
-[icedos.system.bootloaders.systemd-boot]
-mountPoint = "/boot"
-
 [icedos.hardware.network]
 firewall = false
 
@@ -39,3 +36,6 @@ enable = true
 
 [icedos.hardware.pipewire.noise-cancellation]
 enable = true
+
+[icedos.system.bootloaders.systemd-boot]
+mountPoint = "/boot"

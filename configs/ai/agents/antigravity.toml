@@ -1,0 +1,7 @@
+[[icedos.repositories]]
+url = "github:icedos/ai-tools"
+modules = ["antigravity"]
+
+[icedos.ai-tools.ai-accounts.users.ice.agents.antigravity.accounts.jim3692]
+[icedos.ai-tools.ai-accounts.users.ice.agents.antigravity.accounts.joanna]
+[icedos.ai-tools.ai-accounts.users.ice.agents.antigravity.accounts.pantazis]

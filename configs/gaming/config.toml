@@ -1,15 +1,8 @@
 [[icedos.repositories]]
 url = "github:icedos/apps"
 modules = [
-  "gamescope",
-  "kytyps5",
   "lact",
-  "mangohud",
-  "prefixer",
-  "proton-launch",
-  "steam-cloud-file-manager",
   "steam-headless",
-  "unshade",
 ]
 
 [[icedos.repositories]]
@@ -20,15 +13,29 @@ modules = [
   "openrgb",
   "radeon",
   "scx",
-  "steam-wayland-overlay",
   "xpadneo",
   "zenergy",
 ]
 
-[icedos.applications.mangohud]
+[[icedos.repositories]]
+url = "github:icedos/gaming"
+# overrideUrl = "path:/home/ice/Projects/icedos/gaming"
+modules = [
+  "gamescope",
+  "kytyps5",
+  "mangohud",
+  "prefixer",
+  "proton-launch",
+  "steam-cloud-file-manager",
+  "steam-wayland-overlay",
+  "tweaks",
+  "unshade",
+]
+
+[icedos.gaming.mangohud]
 fpsLimit = "0,144,60,30"
 
-[icedos.applications.proton-launch]
+[icedos.gaming.proton-launch]
 presentMode = "immediate"
 
 [icedos.applications.steam]
@@ -49,14 +56,11 @@ capSysAdmin = true
 capture = "kms"
 sunshine_name = "Saloni Desktop"
 
-[icedos.applications.unshade]
+[icedos.gaming.unshade]
 includeInIcedosGc = true
 
 [icedos.hardware.kernel]
 variant = "latest-lto-x86_64-v3"
-
-[icedos.hardware.kernel.scx]
-extraArgs = ["--performance"]
 
 [icedos.system]
 packages = [

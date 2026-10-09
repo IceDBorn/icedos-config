@@ -25,6 +25,3 @@ inboundPorts = [22, 48100, 48200]
 
 [icedos.applications.spotube]
 git = true
-
-[icedos.system.toolset]
-desktopEntries = true

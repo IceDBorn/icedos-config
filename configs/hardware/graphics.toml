@@ -9,4 +9,3 @@ git = true
 
 [icedos.hardware.graphics.radeon]
 featureMask = "0xffffffff"
-rocm = true
