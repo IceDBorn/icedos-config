@@ -1,0 +1,33 @@
+[[icedos.repositories]]
+url = "github:icedos/ai-tools"
+modules = [
+  "basic-memory-mcp",
+  "chrome-devtools-mcp",
+  "context7-mcp",
+  "kwin-mcp",
+  "mcp-server",
+  "nixos-mcp",
+  "rea-mcp",
+]
+
+[icedos.ai-tools.chrome-devtools-mcp]
+executablePath = "/run/current-system/sw/bin/helium"
+
+[icedos.ai-tools.rea-mcp]
+timeout = 21600000
+
+[icedos.ai-tools.mcp-servers.rea.env]
+TMPDIR = "/mnt/games-ssd/ai-dump/nr-variations/re/tmp"
+GHIDRA_HEADLESS_MAXMEM = "8G"
+REA_GHIDRA_STARTUP_TIMEOUT_MS = "21600000"
+
+[icedos.ai-tools.mcp-server.build]
+hosts = ["knp@192.168.1.50", "soupra@192.168.1.14"]
+
+[icedos.ai-tools.mcp-server.storage.drives]
+"/mnt/games-ssd" = "random"
+"/mnt/games-ssd-2" = "random"
+"/mnt/games-hdd" = "sequential"
+
+[environment.sessionVariables]
+MCP_TOOL_TIMEOUT = "21600000"

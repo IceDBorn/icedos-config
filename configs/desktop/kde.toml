@@ -8,7 +8,7 @@ modules = [
   "lumen",
   "move-to-desktop-follow",
   "polonium",
-  "wattmeter",
+  "vigor",
   "window-borders",
 ]
 
@@ -34,7 +34,7 @@ widgets = [
   "org.kde.plasma.icontasks",
   "org.kde.plasma.panelspacer",
   "org.kde.plasma.marginsseparator",
-  "org.icedos.wattmeter",
+  "org.icedos.vigor",
   "org.kde.plasma.systemtray",
   "org.kde.plasma.digitalclock",
   "org.kde.plasma.lock_logout",
@@ -42,8 +42,10 @@ widgets = [
 
 [icedos.desktop.kde.panel.system-tray]
 disabledApplets = [
-  "org.icedos.wattmeter",
+  "org.icedos.vigor",
+  "org.kde.plasma.battery",
   "org.kde.plasma.brightness",
+  "org.kde.plasma.clipboard",
   "org.kde.plasma.weather"
 ]
 
@@ -84,7 +86,7 @@ logs.enabled = false
 latitude = 44.43
 longitude = 26.10
 
-[icedos.desktop.kde.wattmeter]
+[icedos.desktop.kde.vigor]
 price = 0.144
 surcharge = 0.0389
 vat = 6
