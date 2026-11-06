@@ -1,22 +1,19 @@
 [[icedos.repositories]]
 url = "github:icedos/gaming"
 modules = [
-  "nx-optimizer",
+  "lichii",
 ]
 
 [icedos.applications.steam]
-extraPackages = ["eden"]
-
-[icedos.system]
-packages = ["eden"]
+extraPackages = ["lichii"]
 
 [[icedos.applications.sunshine-headless.apps]]
-name = "The Legend of Zelda - Tears of the Kingdom"
+name = "The Legend of Zelda - Ocarina of Time"
 command = [
   "proton-launch",
   "--no-mangohud",
-  "eden",
+  "lichii",
   "-f",
-  "/mnt/games-hdd/games/totk/game.nsp"
+  "/mnt/games-hdd/games/nintendo/oot/game.nsp"
 ]
 env = { QT_QPA_PLATFORM = "xcb", WAYLAND_DISPLAY = "" }
