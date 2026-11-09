@@ -3,6 +3,7 @@ url = "github:icedos/tweaks"
 # overrideUrl = "path:/home/ice/Projects/icedos/tweaks"
 modules = [
   "cachyos",
+  "gc",
   "kernel",
 ]
 

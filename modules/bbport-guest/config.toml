@@ -1,0 +1,9 @@
+[icedos.applications.bbport-guest]
+# Bloodborne dump (the folder that contains eboot.bin), used to seed the guest's launcher settings.
+app0 = "/home/ice/games/bloodborne/CUSA03173"
+# Per-instance config dir (relative to $HOME): its own launcher settings and online account.
+configDir = ".config/bbport-joanna"
+# Per-instance data dir (relative to $HOME): its own saves, bbport.ini and caches.
+dataDir = ".local/share/bbport-joanna"
+# GPU GTT limit in MiB (default is half of RAM). Two instances need about 12 GiB.
+gttMiB = 13312

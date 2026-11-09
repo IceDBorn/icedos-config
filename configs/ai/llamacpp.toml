@@ -5,11 +5,12 @@ modules = ["llamacpp"]
 [icedos.ai-tools.llamacpp]
 patches = [
   { url = "https://github.com/ggml-org/llama.cpp/pull/28507.diff", hash = "sha256-w2vp8CdYk7ksf8XiaW8WEdpcbzRbXV6JJCOJXXYWTk8=" },
+  { url = "https://github.com/ggml-org/llama.cpp/pull/31415.diff", hash = "sha256-0uXrw5oIdXhb2UQjb90LyFyrSufFHcspTGu3kcSevPw=" },
 ]
 priorityUsers = ["ice"]
 
 [icedos.ai-tools.llamacpp.lifecycle]
-idle = 120
+idle = 400
 
 [icedos.ai-tools.llamacpp.settings]
 flashAttn = true
@@ -23,7 +24,7 @@ offload = false
 path = "/home/ice/.local/share/llamacpp/models/mmproj-Qwen3.8-27B-BF16.gguf"
 
 [icedos.ai-tools.llamacpp.settings.model]
-contextSize = 100000
+contextSize = 105000
 path = "/home/ice/.local/share/llamacpp/models/RVN-Qwen3.8-27B-Heretic-GSQ-RCO-IQ3_XXS-mtp.gguf"
 
 [icedos.ai-tools.llamacpp.settings.model.thinking-level-map]

@@ -5,6 +5,7 @@ fetchOptionalDependencies = true
 modules = [
   "dynamic-workspaces",
   "foreground-booster",
+  "kde-virtual-session",
   "lumen",
   "move-to-desktop-follow",
   "plasmazones",
@@ -85,6 +86,9 @@ logs.enabled = false
 [icedos.desktop.kde.lumen]
 latitude = 44.43
 longitude = 26.10
+
+[icedos.desktop.kde.virtual-session]
+home = "shared"
 
 [icedos.desktop.kde.vigor]
 price = 0.144

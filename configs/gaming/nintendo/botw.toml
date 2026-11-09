@@ -1,0 +1,17 @@
+[[icedos.repositories]]
+url = "github:icedos/gaming"
+modules = [
+  "savagewind",
+]
+
+[icedos.applications.steam]
+extraPackages = ["savagewind"]
+
+[[icedos.applications.sunshine-headless.apps]]
+name = "The Legend of Zelda - Breath of the Wild"
+command = [
+  "proton-launch",
+  "--no-mangohud",
+  "savagewind",
+  "--play",
+]

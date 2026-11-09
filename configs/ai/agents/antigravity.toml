@@ -4,4 +4,20 @@ modules = ["antigravity"]
 
 [icedos.ai-tools.ai-accounts.users.ice.agents.antigravity.accounts.jim3692]
 [icedos.ai-tools.ai-accounts.users.ice.agents.antigravity.accounts.joanna]
+[icedos.ai-tools.ai-accounts.users.ice.agents.antigravity.accounts.mparmpamanos]
 [icedos.ai-tools.ai-accounts.users.ice.agents.antigravity.accounts.pantazis]
+
+[icedos.ai-tools.antigravity.settings]
+agentMode = "accept-edits"
+artifactReviewPolicy = "agent-decides"
+enableTerminalSandbox = false
+notifications = false
+showFeedbackSurvey = false
+showTips = false
+toolPermission = "always-proceed"
+useG1Credits = false
+verbosity = "high"
+
+[icedos.ai-tools.antigravity.extensions.recursive-language-models]
+enable = true
+autoload = true
