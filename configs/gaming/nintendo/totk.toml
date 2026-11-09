@@ -1,22 +1,17 @@
 [[icedos.repositories]]
 url = "github:icedos/gaming"
 modules = [
-  "nx-optimizer",
+  "totk-recomp",
 ]
 
 [icedos.applications.steam]
-extraPackages = ["eden"]
-
-[icedos.system]
-packages = ["eden"]
+extraPackages = ["totk-recomp"]
 
 [[icedos.applications.sunshine-headless.apps]]
 name = "The Legend of Zelda - Tears of the Kingdom"
 command = [
   "proton-launch",
   "--no-mangohud",
-  "eden",
-  "-f",
-  "/mnt/games-hdd/games/nintendo/totk/game.nsp"
+  "totk-recomp",
+  "--play",
 ]
-env = { QT_QPA_PLATFORM = "xcb", WAYLAND_DISPLAY = "" }
