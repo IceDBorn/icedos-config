@@ -1,19 +1,18 @@
 [[icedos.repositories]]
 url = "github:icedos/gaming"
 modules = [
-  "lichii",
+  "hookshot",
 ]
 
 [icedos.applications.steam]
-extraPackages = ["lichii"]
+extraPackages = ["hookshot"]
 
 [[icedos.applications.sunshine-headless.apps]]
 name = "The Legend of Zelda - Ocarina of Time"
 command = [
   "proton-launch",
   "--no-mangohud",
-  "lichii",
-  "-f",
-  "/mnt/games-hdd/games/nintendo/oot/game.nsp"
+  "hookshot",
+  "--play",
+  "/mnt/games-hdd/games/nintendo/oot/hookshot/game",
 ]
-env = { QT_QPA_PLATFORM = "xcb", WAYLAND_DISPLAY = "" }

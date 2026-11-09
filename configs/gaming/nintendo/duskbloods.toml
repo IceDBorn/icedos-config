@@ -1,0 +1,36 @@
+[[icedos.repositories]]
+url = "github:icedos/gaming"
+modules = [
+  "lichii",
+  "playdb-cnt",
+]
+
+# [icedos.applications.steam]
+# extraPackages = ["lichii"]
+#
+# # Lichii built from source at nx2 master, so the PRs below apply.
+# [icedos.gaming.lichii]
+# build = "source"
+#
+# [icedos.gaming.lichii.source]
+# rev = "642eace1b71f809544fceb3c9b60be9e4b3148b0"
+# hash = "sha256-R1AKw9QC9c6MyEzBkpwPNw87W87Ugm1bsoxPvZPb6io="
+# pgo = true
+# # Master boots The Duskbloods network test since PR 552. These add the online redirect, GPU thread, texture and shader fixes.
+# patches = [
+#   { url = "https://github.com/zortos293/Lichii/pull/1557.diff", hash = "sha256-MzepgnVU2bdZM3u5yX6Jb9cKCg9RiobVk0m1CRSfrc8=" }, # PR 1557: private server sign-in profiles and EDEN_NX2_ONLINE_* launcher switches on top of master's #1510 redirect (needed by playdb-cnt)
+#   { url = "https://github.com/zortos293/Lichii/pull/933.diff", hash = "sha256-ZC8Ppq45So9X0gJ2fkQKnSSaaW+Y/fD906jH3fhnxhA=" }, # PR 933: polls a suspended list copy without a kernel call each time
+#   { url = "https://github.com/zortos293/Lichii/pull/1051.diff", hash = "sha256-6UpMEXaZXPDDot+JxZtvKzrKVlMUpElqvc9KguQoZ3w=", excludes = ["src/tests/video_core/maxwell_numeric.cpp"] }, # PR 1051: saturates F32 to S32 before integer conversion; the excluded test file conflicts and is not built
+#   { url = "https://github.com/zortos293/Lichii/pull/1129.diff", hash = "sha256-VpHiLqKpT2aOyvy/hhdtDtXdBoIvjfCs9ABk56gmYUw=" }, # PR 1129: texture cache ceiling scales with the device budget on 10+ GiB cards
+#   { url = "https://github.com/zortos293/Lichii/pull/1131.diff", hash = "sha256-Hdeo5F1C2TN4hpHv4Jh0kd0s6wvsnHfwxLBWaK69MEs=" }, # PR 1131: skips re-uploading unchanged Switch 2 uniform banks (closed by a bot, still applies)
+#   { url = "https://github.com/zortos293/Lichii/pull/1267.diff", hash = "sha256-T5VMgBhtZGCK2SpOIkScZdoEz+3ORliBupdUhfGcEjw=" }, # PR 1267: flushes recorded commands before forcing a fence release again
+#   { url = "https://github.com/zortos293/Lichii/pull/1490.diff", hash = "sha256-SbvlsAwVQ/JBYWTxSK4vayue/5vlCB7KFO7ZI0shy8o=" }, # PR 1490: The Duskbloods: native local stack past declared local memory, zero clears reach buffers
+#   { url = "https://github.com/zortos293/Lichii/pull/1527.diff", hash = "sha256-XkXJBlVnKLoLUSWqJx3FHMZp2F4XbuoGfksHMbrT/JQ=" }, # PR 1527: lowers the remaining Ampere shader forms The Duskbloods rejected: grass animation, MSAA resolves, debug queries
+#   { url = "https://github.com/zortos293/Lichii/pull/1501.diff", hash = "sha256-BtbMELyubNuZrnIFczC0alQZpEgzi3ZLgtOFPZ7hHO0=" }, # PR 1501: writes back GPU-written overlapping images before dropping them: character detail maps, message banner
+#   { url = "https://github.com/zortos293/Lichii/pull/1507.diff", hash = "sha256-Idl5mPsvTZykw+MoNc4I9z8oa7BvVesDxfAyXhjFE/o=" }, # PR 1507: accounts for texel-buffer arrays in the sampled-image budget
+#   { url = "https://github.com/zortos293/Lichii/pull/1475.diff", hash = "sha256-faldmBcUrEEVny2YEU+XLzFCkpaIrIJJaoP4/qVIfOY=" }, # PR 1475: logging no longer calls std::terminate when formatting fails under host OOM
+#   { url = "https://github.com/zortos293/Lichii/pull/1642.diff", hash = "sha256-vXT34V93NTe5B2OWSrL9PEY06ok0Mb8G2eZ3e5JqHuw=" }, # PR 1642: keeps snapshots of GPU-written command pages instead of downloading them each time
+#   { url = "https://github.com/zortos293/Lichii/pull/1379.diff", hash = "sha256-4DZGFcdKkkpUjI5MySugMTj9l3nzUjiO5FOJFfMqa7w=" }, # PR 1379: translates skippable native pipelines on shader workers, includes PR 1378 shader reuse
+#   { url = "https://github.com/zortos293/Lichii/pull/1789.diff", hash = "sha256-61MtSpD7rkCMd8ar8lEYBpwGgqAoM26MFyJDdyYeFO4=" }, # PR 1789: CPU write traps skip the texture cache lock on pages that never held an image
+#   { url = "https://github.com/zortos293/Lichii/pull/1783.diff", hash = "sha256-UJM/qAbubb82/2MxuMa8yCAyoGGATJBocgNmf8C53lc=" }, # PR 1783: GetSpan checks every page's host offset (port of Eden #4675)
+# ]

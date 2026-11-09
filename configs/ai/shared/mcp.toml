@@ -22,7 +22,7 @@ GHIDRA_HEADLESS_MAXMEM = "8G"
 REA_GHIDRA_STARTUP_TIMEOUT_MS = "21600000"
 
 [icedos.ai-tools.mcp-server.build]
-hosts = ["soupra@192.168.1.14", "knp@192.168.1.50", "local"]
+hosts = ["server@192.168.1.4", "soupra@192.168.1.14", "knp@192.168.1.50", "local"]
 remoteExec = true
 
 [icedos.ai-tools.mcp-server.storage]
@@ -35,3 +35,7 @@ priority = ["/mnt/games-ssd", "/mnt/games-ssd-2", "/mnt/games-hdd", "host"]
 
 [environment.sessionVariables]
 MCP_TOOL_TIMEOUT = "21600000"
+
+[icedos.ai-tools.mcp-servers.vectorcraft]
+command = "nix-shell"
+args = ["-p", "vectorcraft", "--run", "vectorcraft-cli mcp"]

@@ -1,4 +1,15 @@
-[icedos.ai-tools.skills]
+[[icedos.repositories]]
+url = "github:icedos/ai-tools"
+modules = [
+  "ponytail",
+  "superpowers",
+  "unslop",
+]
+
+[icedos.ai-tools.skills.ponytail]
+autoload = ["ponytail"]
+
+[icedos.ai-tools.skills.pool]
 memory-first = '''
 ---
 name: memory-first
@@ -54,3 +65,6 @@ Save a note after any of these:
 
 **NEVER rely on your own context window as the sole memory.** Always persist to Basic Memory so knowledge survives across sessions.
 '''
+
+[icedos.ai-tools.skills.unslop]
+autoload = ["unslop"]

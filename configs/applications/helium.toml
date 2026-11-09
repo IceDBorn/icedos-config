@@ -27,6 +27,14 @@ sites = [
 ]
 
 [[icedos.applications.helium.profiles]]
+exec = "helium-second"
+name = "Helium - Second"
+sites = [
+  "https://discord.com",
+  "https://github.com",
+]
+
+[[icedos.applications.helium.profiles]]
 exec = "helium-sharkord"
 name = "Sharkord"
 sites = [

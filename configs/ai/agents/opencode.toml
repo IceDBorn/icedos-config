@@ -1,0 +1,46 @@
+[[icedos.repositories]]
+url = "github:icedos/ai-tools"
+modules = ["opencode"]
+
+[icedos.ai-tools.opencode.cli.tabs]
+mode = "off"
+
+[icedos.ai-tools.opencode.cli.session]
+thinking = "show"
+verbosity = "high"
+
+[icedos.ai-tools.opencode.cli.terminal]
+copy = "select"
+
+[icedos.ai-tools.opencode.cli.theme]
+name = "one-dark"
+
+[icedos.ai-tools.opencode.extensions.context-language-models]
+enable = true
+
+[icedos.ai-tools.opencode.extensions.recursive-language-models]
+enable = true
+autoload = true
+
+[icedos.ai-tools.opencode]
+codeReview = true
+freeReview = true
+
+[icedos.ai-tools.opencode.extensions.power]
+enable = true
+
+[icedos.ai-tools.opencode.extensions.vpn-rotate]
+fallbackModels = [
+  "deepseek-v4.1-flash-free",
+  "mimo-v2.6-flash-free",
+]
+fallbackReturn = "stay"
+
+[icedos.ai-tools.opencode.settings]
+model = "opencode/deepseek-v4.1-flash-free#max"
+websearch = { provider = "random" }
+
+[icedos.ai-tools.opencode.settings.providers.opencode.models]
+"deepseek-v4.1-flash-free".limit.context = 332000
+"longcat-2.5-free".limit.context = 862144
+"mimo-v2.6-flash-free".limit.context = 332000
